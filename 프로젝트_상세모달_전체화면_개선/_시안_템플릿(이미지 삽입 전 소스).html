@@ -1,0 +1,671 @@
+<title>갤러리 프로젝트 상세 개선 시안</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  :root{
+    --paper:#FAF7F1; --ink:#26221C; --ink-soft:#6E6659; --line:#E4DCCF; --card:#FFFFFF;
+    --accent:#F2600C; --accent-soft:#FDEBDD; --lime:#D9E84A;
+    --stage:#241F1A; --stage-ink:#F5F1E8; --stage-soft:#A89F8F;
+    --appfont:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    font-size:15px;line-height:1.65;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+  h1{font-size:30px;line-height:1.3;margin:8px 0 12px;text-wrap:balance;font-weight:700}
+  .lede{color:var(--ink-soft);max-width:640px;margin:0 0 20px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
+  .chip{background:var(--accent-soft);color:#B34505;border:1px solid #F5C9A6;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+  h2{font-size:18px;margin:44px 0 6px;font-weight:700}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 16px}
+
+  /* ---- 갤러리 그리드 ---- */
+  .gallery{columns:3;column-gap:16px}
+  @media (max-width:760px){.gallery{columns:2}}
+  .gcard{
+    display:block;width:100%;break-inside:avoid;margin:0 0 16px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .gcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(38,34,28,.10)}
+  .gcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .gcard .art{position:relative}
+  .gcard .art img{width:100%;display:block}
+  .gcard .vbadge{position:absolute;right:10px;top:10px;background:rgba(26,26,26,.7);color:#fff;border-radius:8px;font-size:11.5px;font-weight:700;padding:3px 8px}
+  .gcard .pin{position:absolute;left:10px;top:10px;background:rgba(242,96,12,.92);color:#fff;border-radius:8px;font-size:11.5px;font-weight:700;padding:3px 8px}
+  .gcard .meta{padding:11px 14px 13px}
+  .gcard .meta b{display:block;font-size:14.5px}
+  .gcard .meta span{font-size:12.5px;color:var(--ink-soft)}
+
+  /* ---- 규칙 목록 ---- */
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:8px}
+  .rule{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .rule b{display:block;margin-bottom:4px;font-size:14.5px}
+  .rule p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+  .rule code{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px}
+
+  /* ==== 전체 화면 오버레이 ==== */
+  .overlay{position:fixed;inset:0;background:var(--stage);z-index:50;display:flex;flex-direction:column}
+  .topbar{
+    height:56px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px 0 8px;
+    background:#1D1915;color:var(--stage-ink);border-bottom:1px solid #38322A;
+  }
+  .topbar .title{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tb-btn{
+    background:none;border:none;color:var(--stage-ink);font:inherit;font-size:13.5px;font-weight:600;
+    border-radius:8px;padding:8px 10px;cursor:pointer;white-space:nowrap;
+  }
+  .tb-btn:hover{background:rgba(255,255,255,.09)}
+  .tb-btn:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+  .tb-btn:disabled{opacity:.3;cursor:default}
+  .tb-btn:disabled:hover{background:none}
+  .crumb{font-size:13px;color:var(--stage-soft);white-space:nowrap}
+  .spacer{flex:1}
+  /* 1-2 댓글 숨김 해제 */
+  .unhideBtn{
+    background:rgba(255,255,255,.12);border:none;color:var(--stage-ink);font:inherit;font-size:12.5px;font-weight:600;
+    border-radius:8px;padding:6px 11px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .unhideBtn:hover{background:rgba(255,255,255,.22)}
+
+  .body{flex:1;display:flex;min-height:0}
+
+  /* 미디어 스테이지 — 좌우 92px는 게시물 이동 화살표 자리 */
+  .mediaStage{flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center;padding:14px 92px;overflow:hidden}
+  .mediaBox{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+  /* 확대는 이미지에만 적용 — 화살표·인디케이터·뱃지는 함께 커지지 않음 */
+  .zoomTarget{display:flex;will-change:transform;transform-origin:0 0}
+  /* 가용 영역 = 100vw − 레일 320 − 좌우 92×2 / 100dvh − 상단바 56 − 상하 14×2 */
+  .mediaBox img, .mediaBox video{max-width:calc(100vw - 504px);max-height:calc(100dvh - 84px);width:auto;height:auto;display:block;border-radius:10px}
+  /* 미디어 2장 이상이면 하단 컨트롤(44px)만큼 높이 양보 */
+  .mediaBox.hasCtrl img, .mediaBox.hasCtrl video{max-height:calc(100dvh - 128px)}
+  .mediaBox video{background:#000}
+  .zoomTarget.grab, .zoomTarget.grab img{cursor:grab}
+  .zoomTarget.grab video{cursor:grab}
+  .zoomTarget.grabbing, .zoomTarget.grabbing img, .zoomTarget.grabbing video{cursor:grabbing}
+  .zoomTarget.grabbing{user-select:none}
+
+  /* 1-14 영상 길이 뱃지 — 이미지 좌상단에 고정(확대 무관) */
+  .durBadge{
+    position:absolute;left:12px;top:12px;background:rgba(20,17,14,.72);color:#fff;
+    font-size:12.5px;font-weight:700;border-radius:8px;padding:3px 9px;font-variant-numeric:tabular-nums;
+    backdrop-filter:blur(6px);z-index:2;pointer-events:none;
+  }
+
+  /* 1-15 · 1-16 동일 게시물 내 미디어 이동 — 이미지 바깥 하단 */
+  .mediaCtrl{flex:none;display:flex;align-items:center;gap:12px;height:34px}
+  .mBtn{
+    width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.14);color:var(--stage-ink);font-size:13px;
+  }
+  .mBtn:hover{background:rgba(255,255,255,.28)}
+  .dots{display:flex;gap:7px}
+  .dots button{width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.32);cursor:pointer;padding:0}
+  .dots button.on{background:var(--accent);width:20px;border-radius:99px}
+
+  /* 1-7 다음·이전 게시물 이동 — 스테이지 좌우 큰 화살표 */
+  .pArrow{
+    position:absolute;top:50%;transform:translateY(-50%);width:64px;height:64px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.13);color:var(--stage-ink);font-size:24px;cursor:pointer;z-index:3;
+    display:flex;align-items:center;justify-content:center;transition:background .15s ease;
+  }
+  .pArrow:hover{background:rgba(255,255,255,.3)}
+  .pArrow:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+  .pArrow:disabled{opacity:.22;cursor:default}
+  .pArrow:disabled:hover{background:rgba(255,255,255,.13)}
+  .pArrow.prev{left:14px}.pArrow.next{right:14px}
+  .pArrow small{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--stage-soft);white-space:nowrap}
+  /* 1-18 조작 안내 */
+  .hintBar{
+    position:absolute;left:12px;bottom:12px;z-index:3;
+    display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+    background:rgba(20,17,14,.6);border-radius:14px;padding:11px 14px;backdrop-filter:blur(8px);
+  }
+  .hint{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--stage-ink);white-space:nowrap}
+  .hint .ic{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+  .hint .key{
+    display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;padding:0 4px;
+    border:1px solid rgba(255,255,255,.4);border-radius:4px;font-size:10.5px;font-weight:700;line-height:1;
+  }
+  /* 1-1 큐레이션 정보 — 클릭 이동 */
+  .crumbLink{
+    background:none;border:none;font:inherit;font-size:13px;color:var(--stage-soft);cursor:pointer;
+    padding:4px 6px;border-radius:6px;white-space:nowrap;
+  }
+  .crumbLink:hover{color:var(--stage-ink);background:rgba(255,255,255,.09);text-decoration:underline}
+  .titleLink{
+    background:none;border:none;font:inherit;font-weight:700;font-size:15px;color:var(--stage-ink);cursor:pointer;
+    padding:4px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:340px;
+  }
+  .titleLink:hover{background:rgba(255,255,255,.09);text-decoration:underline}
+
+  /* ==== 우측 레일 ==== */
+  .rail{
+    width:320px;flex:none;background:#FFFFFF;color:var(--ink);font-family:var(--appfont);
+    border-left:1px solid #EAE3D6;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .railHead{flex:none;padding:18px 18px 12px;border-bottom:1px solid #F1ECE2;position:relative}
+  .railScroll{
+    flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    padding:14px 18px 8px;display:flex;flex-direction:column;gap:14px;
+    scrollbar-width:thin;scrollbar-color:#D9D0C0 transparent;
+  }
+  .railScroll::-webkit-scrollbar{width:8px}
+  .railScroll::-webkit-scrollbar-thumb{background:#DCD3C3;border-radius:99px;border:2px solid #fff}
+  .railScroll::-webkit-scrollbar-track{background:transparent}
+  /* 레일 하단 고정 바 (1-10 고정핀 / 1-11 챌린지 상세) */
+  .railFoot{
+    flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:10px 14px;border-top:1px solid #F1ECE2;background:#FCFAF6;
+  }
+  .pinBtn{
+    background:#fff;border:1px solid #E3DAC8;border-radius:10px;cursor:pointer;
+    font:inherit;font-size:15px;padding:6px 11px;line-height:1;color:#8A7F6E;
+  }
+  .pinBtn:hover{border-color:var(--accent)}
+  .pinBtn.on{background:var(--accent-soft);border-color:#F5C9A6;color:#B34505}
+  .challBtn{
+    background:#fff;border:1px solid #E3DAC8;border-radius:10px;cursor:pointer;
+    font:inherit;font-size:12.5px;font-weight:700;padding:7px 12px;color:#4A443B;
+  }
+  .challBtn:hover{border-color:var(--accent);color:#B34505}
+
+  /* 1-3 작성자 정보 */
+  .maker{display:flex;align-items:center;gap:10px}
+  .maker .avatar{width:40px;height:40px;border-radius:50%;background:#EAF3FA;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+  .maker .mInfo{flex:1;min-width:0}
+  .maker b{font-size:14.5px;font-weight:700}
+  .maker .date{display:block;font-size:12px;color:var(--ink-soft)}
+  .moreWrap{position:relative;flex:none}
+  .more{background:none;border:none;font-size:18px;color:var(--ink-soft);cursor:pointer;padding:4px 6px;border-radius:8px}
+  .more:hover{background:#F5F1EA}
+  .menu{
+    position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid #E7E0D2;
+    border-radius:10px;box-shadow:0 8px 24px rgba(38,34,28,.16);z-index:5;min-width:150px;overflow:hidden;
+  }
+  .menu button{
+    display:block;width:100%;text-align:left;background:none;border:none;font:inherit;font-size:13px;
+    padding:10px 14px;cursor:pointer;color:var(--ink);white-space:nowrap;
+  }
+  .menu button:hover{background:#F7F3EC}
+
+  /* 1-6 게시물 내용 */
+  .pBody{margin:0;font-size:16px;font-weight:600;line-height:1.68;letter-spacing:-.005em;color:#26221C;white-space:pre-wrap;word-break:break-word}
+  .bodyLen{font-size:11px;color:#A79D8C;font-family:"IBM Plex Sans KR",sans-serif}
+
+  /* 1-7~1-9 댓글 */
+  .cmtHead{font-size:12.5px;font-weight:700;color:var(--ink-soft);border-top:1px solid #F1ECE2;padding-top:12px}
+  .cmtHead b{color:var(--accent)}
+  .cmts{display:flex;flex-direction:column;gap:14px}
+  .cmt{display:flex;gap:9px;position:relative}
+  .cmt .cAvatar{width:28px;height:28px;border-radius:8px;background:#F4EEE2;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  .cmt .cBody{min-width:0;flex:1}
+  .cmt .cHead{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .cmt .cHead .cDate{font-weight:400;color:var(--ink-soft);font-size:11.5px}
+  .cmt p{margin:2px 0 0;font-size:13px;font-weight:400;line-height:1.6;color:#3E3830}
+  .cmt.byAuthor p{color:#A79D8C}
+  .cmt .cMore{background:none;border:none;font-size:15px;color:#B8AE9E;cursor:pointer;padding:2px 4px;border-radius:6px;flex:none;align-self:flex-start}
+  .cmt .cMore:hover{background:#F5F1EA;color:var(--ink-soft)}
+
+  @media (max-width:1100px){
+    .mediaStage{padding:14px 72px}
+    .mediaBox img, .mediaBox video{max-width:calc(100vw - 464px)}
+    .pArrow{width:52px;height:52px;font-size:20px}
+    .pArrow small{display:none}
+  }
+
+  footer{margin-top:56px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:16px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">클래스 웹 · 개선 제안 2</div>
+  <h1>갤러리 프로젝트 상세, 모달에서 전체 화면으로</h1>
+  <p class="lede">현재 프로젝트 상세 모달은 이미지·영상이 작게 보인다는 VOC가 수집됨.
+  갤러리에서 프로젝트 클릭 시 같은 탭에서 <b>전체 화면 [프로젝트 상세보기]</b>로 진입하고,
+  세로형·가로형·정방형·영상 어떤 비율이든 <b>미디어를 영역에 꽉 차게(여백 최소)</b> 보여주는 안.
+  <b>기존 기획서(curation_gallery 1-1~1-16)의 구성요소는 모두 유지</b>하고 배치만 전체 화면에 맞게 재정렬함.</p>
+  <div class="chips">
+    <span class="chip">새 창·새 탭 없이 전체 화면 진입</span>
+    <span class="chip">모든 비율 영역 맞춤</span>
+    <span class="chip">기존 구성요소 1-1~1-16 유지</span>
+    <span class="chip">휠·핀치 확대 + 드래그</span>
+  </div>
+
+  <h2>데모</h2>
+  <p class="sub">프로젝트를 클릭하면 전체 화면 상세보기로 진입함. <b>좌우 큰 화살표</b>(또는 방향키 ←→)로 다음·이전 작품으로 넘기고, 미디어 위에서 <b>휠·트랙패드 핀치로 확대</b> 후 드래그로 이동(더블클릭 = 원래 크기).
+  게시물별로 큐레이션 정보(1-1) 3가지 케이스, 미디어 여러 장(1-15·1-16), 영상 길이(1-14), 관리자가 숨긴 댓글(1-2·1-9-1 — 첫 게시물에서 숨김 해제·재숨김 동작 확인 가능), 본문 500자, 댓글 16개 스크롤이 각각 들어 있음. 상단 브레드크럼과 각 버튼은 클릭 시 이동 경로가 표시됨. <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
+  <div class="gallery" id="gallery"></div>
+
+  <h2>레이아웃 규칙</h2>
+  <div class="rules">
+    <div class="rule"><b>1 · 전체 화면 레이어 진입</b><p>갤러리에서 프로젝트 클릭 → 같은 탭에서 <code>fixed inset:0</code> 레이어(또는 라우트)로 전환. 상단 56px 바에 큐레이션 정보(1-1)·댓글 숨김 해제(1-2)·닫기(1-5) 배치.</p></div>
+    <div class="rule"><b>2 · 미디어 영역 맞춤 (여백 최소)</b><p>미디어 스테이지 = 화면 − 상단바 − 우측 레일 − 좌우 92px(작품 넘기기 화살표 자리). 1280×800에서 가용 폭 <b>776px</b>. 기존 <code>4:5 고정</code> 대신 <b>원본 비율 그대로 contain</b>으로 표시(이번 개선의 핵심). 원본 해상도보다 크게는 늘리지 않고, 더 크게 볼 때는 확대 기능을 사용.</p></div>
+    <div class="rule"><b>3 · 확대 — 휠·핀치 + 드래그</b><p>미디어 위에서 휠 또는 트랙패드 핀치로 커서 위치 기준 1~3배 확대, 드래그로 이동, 더블클릭·작품 전환 시 원래 크기. 영상은 재생 중에도 확대·이동 가능. <b>확대는 이미지에만 적용</b>되고 화살표·인디케이터·영상 길이 뱃지는 함께 커지지 않음.</p></div>
+    <div class="rule"><b>4 · 우측 레일 320px 3단 구조</b><p>[고정 헤더: 작성자 정보(1-3)·더보기(1-4)] + [스크롤: 본문(1-6) → 댓글 수 → 댓글 목록(1-7~1-9)] + [고정 푸터: 고정핀(1-10)·챌린지 상세(1-11)]. 본문 500자·댓글 다수에도 레일 안에서만 스크롤되고 미디어는 고정.</p></div>
+    <div class="rule"><b>5 · 이동 화살표 2종 분리</b><p>다음·이전 <b>작품</b> 이동(1-7)은 스테이지 좌우 <b>64px 큰 화살표</b>(가장 자주 쓰는 조작이라 크게). 동일 게시물 내 <b>미디어</b> 이동(1-15)은 이미지 <b>바깥 하단</b>의 ◀ ● ● ▶ 컨트롤(1-16 인디케이터와 한 묶음) — 이미지 위에 겹치지 않아 작품을 가리지 않고, 확대 시 함께 커지지도 않음.</p></div>
+    <div class="rule"><b>6 · 브레드크럼 이동</b><p>상단 <code>아하오호 갤러리 › 큐레이션명 › 챌린지명</code>은 모두 클릭 가능 — 갤러리(닫기) / 해당 큐레이션 화면 / 챌린지 상세 보기 모달로 이동. 자율창작은 챌린지명만, 나만의 프로젝트는 미표시(기획서 1-1 규칙 유지).</p></div>
+  </div>
+
+  <footer>레이아웃 검증용 목업 — 미디어·영상은 실제 프로젝트 리소스, 본문·댓글·큐레이션명·챌린지명은 예시(실명 제외) · 기존 기획서: <code>이전 기획서/</code> (Page ID <code>curation_gallery</code>) · 기준 기기: LG 그램 14 (1920×1200 @150% = 1280×800)</footer>
+</div>
+
+<!-- ===== 전체 화면 상세보기 ===== -->
+<div class="overlay" id="ov" hidden role="dialog" aria-modal="true" aria-label="프로젝트 상세보기">
+  <div class="topbar">
+    <button class="tb-btn" onclick="closeViewer()" aria-label="닫기">←</button>
+    <!-- 1-1 큐레이션 정보 (클릭 시 해당 화면으로 이동) -->
+    <button class="crumbLink" onclick="closeViewer()">아하오호 갤러리</button>
+    <span class="crumb" id="crumbSep1" hidden>›</span>
+    <button class="crumbLink" id="crumbCuration" onclick="act('큐레이션 화면으로 이동')" hidden></button>
+    <span class="crumb" id="crumbSep2" hidden>›</span>
+    <button class="titleLink" id="crumbChallenge" onclick="act('챌린지 상세 보기 모달 출력')" hidden></button>
+    <div class="spacer"></div>
+    <!-- 1-2 숨겨진 댓글 숨김 해제 -->
+    <button class="unhideBtn" id="unhideBtn" onclick="doUnhide()" hidden>👁 댓글 숨김 해제</button>
+    <!-- 1-5 닫기 -->
+    <button class="tb-btn" onclick="closeViewer()" aria-label="닫기">✕</button>
+  </div>
+  <div class="body">
+    <div class="mediaStage">
+      <!-- 1-7 다음·이전 게시물 이동 -->
+      <button class="pArrow prev" id="prevBtn" onclick="go(-1)" aria-label="이전 작품">◀<small>이전 작품</small></button>
+      <div class="mediaBox" id="mediaBox">
+        <div class="zoomTarget" id="zoomTarget">
+          <img id="stageImg" src="" alt="프로젝트 미디어">
+          <video id="stageVid" controls playsinline preload="metadata" hidden></video>
+        </div>
+        <span class="durBadge" id="durBadge" hidden>0:12</span>
+        <!-- 1-15 · 1-16 동일 게시물 내 미디어 이동 (이미지 바깥) -->
+        <div class="mediaCtrl" id="mediaCtrl" hidden>
+          <button class="mBtn" onclick="showMedia(mCur-1)" aria-label="이전 미디어">◀</button>
+          <div class="dots" id="dots"></div>
+          <button class="mBtn" onclick="showMedia(mCur+1)" aria-label="다음 미디어">▶</button>
+        </div>
+      </div>
+      <button class="pArrow next" id="nextBtn" onclick="go(1)" aria-label="다음 작품">▶<small>다음 작품</small></button>
+      <!-- 1-18 조작 안내 -->
+      <div class="hintBar" id="hintBar">
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17 17M6.5 8.5h4M8.5 6.5v4"/></svg>
+          휠·핀치로 확대
+        </span>
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><path d="M10 3v14M3 10h14M10 3 7.5 5.5M10 3l2.5 2.5M10 17l-2.5-2.5M10 17l2.5-2.5M3 10l2.5-2.5M3 10l2.5 2.5M17 10l-2.5-2.5M17 10l-2.5 2.5"/></svg>
+          드래그로 이동
+        </span>
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><path d="M5 3.5 8 16l2.2-4.4L15 10.5z"/><path d="M13.5 3.5v2M16.5 6.5h-2"/></svg>
+          더블클릭하면 원래 크기
+        </span>
+        <span class="hint">
+          <span class="key">←</span><span class="key">→</span>작품 넘기기
+        </span>
+        <span class="hint">
+          <span class="key">ESC</span>닫기
+        </span>
+      </div>
+    </div>
+
+    <aside class="rail">
+      <!-- 1-3 작성자 정보 + 1-4 더보기 -->
+      <div class="railHead">
+        <div class="maker">
+          <div class="avatar" id="pAvatar">🐦</div>
+          <div class="mInfo">
+            <b id="pMaker">메이커</b>
+            <span class="date" id="pDate">9월 1일</span>
+          </div>
+          <div class="moreWrap">
+            <button class="more" onclick="toggleMenu('postMenu')" aria-label="더보기">⋯</button>
+            <div class="menu" id="postMenu" hidden>
+              <button onclick="act('메시지 보내기 → 메시지 전송하기 모달')">메시지 보내기</button>
+              <button onclick="act('멤버 정보 보기 → 멤버 상세 보기 화면')">멤버 정보 보기</button>
+              <button onclick="act('게시물 숨기기 → 게시물 숨김 확인 모달')">게시물 숨기기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="railScroll" id="railScroll">
+        <!-- 1-6 게시물 내용 -->
+        <p class="pBody" id="pBody"></p>
+        <span class="bodyLen" id="bodyLen"></span>
+        <div class="cmtHead" id="cmtHead">댓글 <b>0</b></div>
+        <!-- 1-7~1-9 댓글 -->
+        <div class="cmts" id="cmts"></div>
+      </div>
+      <!-- 1-10 고정핀 / 1-11 챌린지 상세 보기 -->
+      <div class="railFoot">
+        <button class="pinBtn" id="pinBtn" onclick="togglePin()" title="게시물 고정">📌</button>
+        <button class="challBtn" id="challBtn" onclick="act('챌린지 상세 보기 모달 출력')">🏆 챌린지 상세 보기</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const M_PORT = '{{M_PORT}}';       // 818×1096 세로 (뱃지)
+  const M_LAND = '{{M_LAND}}';       // 856×638 가로 (다이어리)
+  const VID_MP4 = '{{VID_MP4}}';     // 854×480 영상 12초
+  const VID_POSTER = '{{VID_POSTER}}';
+  const EX_PLANE  = '{{EX_PLANE}}';  // 750×408 초가로 (3D 비행기)
+  const EX_ROBOT  = '{{EX_ROBOT}}';  // 750×1000 세로 (로봇 강아지)
+  const EX_ROBOT2 = '{{EX_ROBOT2}}'; // 620×620 정방형 (로봇 클로즈업)
+  const EX_CAT    = '{{EX_CAT}}';    // 750×563 가로 (골판지 고양이)
+  const EX_RUN    = '{{EX_RUN}}';    // 750×1332 초세로 (달리기)
+  const EX_DRAW   = '{{EX_DRAW}}';   // 750×1000 세로 (색연필 그림)
+
+  const OHO = {name:'오호', avatar:'🦋'};
+
+  /* 본문 500자 꽉 채운 케이스 (게시물은 제목 없이 본문만, 최대 500자) */
+  const BODY_500 = '이번에는 제가 제일 좋아하는 캐릭터를 색연필로 그려봤어요! 처음에는 얼굴 무늬를 어떻게 그려야 할지 몰라서 연필로 여러 번 스케치했는데, 마음에 안 들어서 지웠다가 다시 그렸어요. 특히 눈 안쪽에 글자가 들어가 있는 부분이 제일 어려웠는데 아주 얇은 색연필로 조금씩 칠하니까 생각보다 잘 나온 것 같아요. 배경은 파란색을 여러 겹 겹쳐서 칠했어요. 처음에는 연하게 칠하고 그 위에 진한 파란색을 덧칠했더니 깊이가 생겨서 진짜 신기했어요. 옷 주름도 선만 그리면 납작해 보여서 어두운 부분을 조금 더 진하게 칠했더니 입체감이 생겼어요. 앞으로 뻗은 손은 크게 그려야 하는데 비율 맞추는 게 정말 힘들어서 세 번이나 다시 그렸답니다. 색연필은 물감처럼 부드럽게 섞이지는 않지만 힘을 다르게 주면서 칠하면 그라데이션도 만들 수 있다는 걸 이번에 알게 됐어요. 다 그리고 보니 두 시간이 훌쩍 지났는데 하나도 아깝지 않았어요. 다음에는 다른 캐릭터도 그려서 꼭 올려볼게요. 끝까지 봐주셔서 감사합니다!';
+
+  const MANY = [
+    {name:'지후', avatar:'🐳', memberName:'박지후', date:'9월 2일', text:'와 이거 어떻게 만든거야?? 나도 만들어보고 싶어!'},
+    {name:'퓨야호', avatar:'🐻', memberName:'최유하', date:'9월 2일', text:'다리 부분이 제일 신기해 ㅋㅋㅋ'},
+    {name:'김뿌꾸', avatar:'🌙', date:'9월 2일', text:'움직이는 것도 보여주세요!!'},
+    {name:'초코송이', avatar:'🐢', date:'9월 2일', text:'색깔 조합 진짜 예쁘다 초록색 좋아'},
+    {name:'딸기우유', avatar:'🍓', date:'9월 2일', text:'나도 이 블록 있는데 이렇게는 못 만들었어 대박'},
+    {name:'바람돌이', avatar:'🌊', date:'9월 3일', text:'눈 부분 어떻게 붙인거야? 잘 안되던데'},
+    {name:'하르방', avatar:'🎨', date:'9월 3일', text:'귀 노란색 포인트 최고👍'},
+    {name:'구름조종사', avatar:'✈️', date:'9월 3일', text:'다음엔 비행기도 만들어줘요 ㅎㅎ'},
+    {name:'댕댕이발자국', avatar:'🐱', date:'9월 3일', text:'우리집 강아지랑 닮았어 ㅋㅋㅋㅋ'},
+    {name:'파랑물감', avatar:'🎨', date:'9월 3일', text:'사진 두 장으로 보여준 거 좋다 얼굴 잘 보여!'},
+    {name:'번개토끼', avatar:'⚡', date:'9월 4일', text:'조립하는 데 얼마나 걸렸어요?'},
+    {name:'고사리', avatar:'🐥', date:'9월 4일', text:'설명서 보고 만든거야 아니면 그냥 만든거야?'},
+    {name:'벽돌마스터', avatar:'🧱', date:'9월 4일', text:'꼬리도 달아주면 더 강아지 같을 것 같아요!'},
+    {name:'초록발명가', avatar:'🤖', date:'9월 4일', text:'꼬리는 다음 버전에 만들어볼게요 ㅎㅎ'},
+    {name:'안녕하시와요', avatar:'🦉', date:'9월 5일', text:'진짜 정교하다... 존경'},
+    {...OHO, date:'9월 5일', text:'초록색 몸통에 까만 얼굴, 노란 귀까지 완전 귀엽다 🐶 두 번째 사진으로 얼굴을 가까이 보여줘서 좋아! 친구들이 궁금해하는 게 이렇게 많다는 건 그만큼 잘 만들었다는 뜻이야 ✨'},
+  ];
+
+  /* type: curation(큐레이션명>챌린지명) / free(챌린지명만) / my(큐레이션 정보 없음) */
+  const projects = [
+    {type:'curation', curation:'아크크 서포터즈 3주차', challenge:'나만의 뱃지 만들기',
+     maker:'하르방', avatar:'🎨', memberName:'김하늘', date:'9월 1일', media:[M_PORT], video:false, pinned:true,
+     body:'아하오호뱃지다!',
+     comments:[
+       {...OHO, date:'9월 1일', text:'우와 별 모양 뱃지에 노란색 \'ㅋ\'자가 콕 박혀있는 거 완전 눈에 확 들어온다! ✨ 까만 바탕에 반짝이는 초록금색 끈까지 달려있어서 보고 있으니까 왠지 특별한 보물처럼 느껴져 🌟 완전 애정 담아 만든 거 티나! 😍'},
+       {name:'지후', avatar:'🐳', memberName:'박지후', date:'9월 2일', text:'뱃지 나도 만들고 싶다!! 어디서 살 수 있어?', hiddenByAdmin:true},
+       {name:'구름이', avatar:'☁️', date:'9월 2일', text:'(작성자가 앱에서 숨긴 댓글)', hiddenByAuthor:true},
+     ]},
+    {type:'curation', curation:'그림 챌린지 모음', challenge:'좋아하는 캐릭터 그리기',
+     maker:'파랑물감', avatar:'🎨', memberName:null, date:'8월 29일', media:[EX_DRAW], video:false,
+     body:BODY_500,
+     comments:[
+       {name:'김뿌꾸', avatar:'🌙', date:'8월 30일', text:'파란색 진하기가 다 달라서 진짜 멋져요'},
+       {...OHO, date:'8월 29일', text:'파란색을 겹겹이 칠해서 만든 무늬가 진짜 대단하다 💙 손 부분 명암까지 표현한 거 보고 깜짝 놀랐어! 두 시간 동안 집중한 게 그림에 그대로 담겨 있는 것 같아 ✨'},
+     ]},
+    {type:'curation', curation:'만들기 챌린지', challenge:'움직이는 로봇 만들기',
+     maker:'초록발명가', avatar:'🤖', memberName:'이도윤', date:'9월 1일', media:[EX_ROBOT, EX_ROBOT2], video:false,
+     body:'내가 조립한 로봇 강아지! 다리 움직이게 하려고 기어를 두 개 넣었어요 🐶',
+     comments: MANY},
+    {type:'free', curation:null, challenge:'3D로 상상한 것 만들기',
+     maker:'구름조종사', avatar:'✈️', memberName:null, date:'9월 1일', media:[EX_PLANE], video:false,
+     body:'하늘을 나는 파란 비행기 만들었어요! 프로펠러도 돌아가게 하고 싶었는데 그건 다음에 도전할게요 ✈️',
+     comments:[
+       {...OHO, date:'9월 1일', text:'프로펠러부터 날개 위 별 마크까지 진짜 비행기 같다! ✈️ 3D로 이렇게 만들려면 블록을 엄청 많이 쌓았을 텐데, 다음엔 어떤 탈것을 만들어볼 거야?'},
+     ]},
+    {type:'curation', curation:'여름 방학 추천 챌린지', challenge:'나만의 이야기 쓰기',
+     maker:'고사리', avatar:'🐥', memberName:null, date:'9월 1일', media:[M_LAND], video:false,
+     body:'이야기3',
+     comments:[
+       {name:'지후', avatar:'🐳', date:'9월 1일', text:'이건 무슨이야기야? 궁금해'},
+       {...OHO, date:'9월 1일', text:'우와 다이어리 가득 빽빽하게 써놓은 이야기3 완전 몰입해서 쓴 거 같아! 📖✨ 줄마다 꼼꼼하게 채워진 글씨 보니까 네가 얼마나 진지하게 빠져있었는지 느껴져. 다음 이야기4에서는 또 어떤 사건이 벌어질지 궁금한걸? 🤩'},
+     ]},
+    {type:'my', curation:null, challenge:null,
+     maker:'댕댕이발자국', avatar:'🐱', memberName:null, date:'8월 31일', media:[EX_CAT], video:false,
+     body:'골판지 고양이 기사 등장! 왕관이랑 검도 골판지로 만들었어요 🐱',
+     comments:[
+       {...OHO, date:'8월 31일', text:'골판지를 찢어서 만든 모자랑 수염 무늬가 완전 개성 만점이야 🐱 손에 든 건 검이야? 고양이 기사의 다음 모험이 궁금해지는걸!'},
+     ]},
+    {type:'curation', curation:'만들기 챌린지', challenge:'스케치북으로 세상 만들기',
+     maker:'벽돌마스터', avatar:'🧱', memberName:null, date:'9월 1일', media:[VID_MP4], video:true, poster:VID_POSTER, duration:'0:12',
+     body:'스케치북 속에 레고 마을을 만들었어요! 영상으로 한 바퀴 구경시켜 줄게요 🏘️',
+     comments:[
+       {name:'퓨야호', avatar:'🐻', date:'9월 2일', text:'마을에 캐릭터들 진짜 많다!! 다음 페이지도 보여줘'},
+       {...OHO, date:'9월 1일', text:'스케치북 안에 마을 하나가 통째로 들어있네! 🏘️ 손으로 넘기면서 소개해주니까 진짜 구경하는 기분이야. 제일 아끼는 캐릭터는 누구야?'},
+     ]},
+    {type:'my', curation:null, challenge:null,
+     maker:'바람돌이', avatar:'🌊', memberName:null, date:'8월 30일', media:[EX_RUN], video:false,
+     body:'노을 앞에서 전력질주! 바다 배경으로 점프하는 순간을 찍었어요 🌅',
+     comments:[
+       {...OHO, date:'8월 30일', text:'바다랑 노을을 배경으로 달리는 모습이 꼭 영화의 한 장면 같아 🌅 팔을 쭉 뻗은 포즈가 진짜 빠르게 달리는 것처럼 보여!'},
+     ]},
+  ];
+
+  /* ===== 갤러리 그리드 ===== */
+  const gal = document.getElementById('gallery');
+  projects.forEach((p,i)=>{
+    const b = document.createElement('button');
+    b.className = 'gcard';
+    b.onclick = ()=>openViewer(i);
+    const excerpt = p.body.length > 32 ? p.body.slice(0,32) + '…' : p.body;
+    b.innerHTML = `<div class="art"><img src="${p.video ? p.poster : p.media[0]}" alt="${p.maker}의 프로젝트">
+      ${p.video?'<span class="vbadge">▶ 영상</span>':''}${p.pinned?'<span class="pin">📌 고정</span>':''}</div>
+      <div class="meta"><b>by. ${p.maker}</b><span>${excerpt}</span></div>`;
+    gal.appendChild(b);
+  });
+
+  /* ===== 상세보기 ===== */
+  const ov = document.getElementById('ov');
+  let cur = 0, mCur = 0;
+
+  function openViewer(i){ ov.hidden = false; showProject(i); document.body.style.overflow='hidden'; }
+  function closeViewer(){ ov.hidden = true; document.body.style.overflow=''; resetZoom(); closeAllMenus(); }
+
+  function esc(s){ return s.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+  function showProject(i){
+    cur = Math.max(0, Math.min(projects.length-1, i));
+    mCur = 0;
+    resetZoom(); closeAllMenus();
+    const p = projects[cur];
+
+    /* 1-1 큐레이션 정보 — 클릭 시 해당 화면 이동 */
+    const cCur = document.getElementById('crumbCuration');
+    const cCha = document.getElementById('crumbChallenge');
+    const s1 = document.getElementById('crumbSep1');
+    const s2 = document.getElementById('crumbSep2');
+    if (p.type === 'curation'){
+      s1.hidden = false; cCur.hidden = false; cCur.textContent = p.curation;
+      s2.hidden = false; cCha.hidden = false; cCha.textContent = p.challenge;
+    } else if (p.type === 'free'){
+      s1.hidden = false; cCur.hidden = true;
+      s2.hidden = true;  cCha.hidden = false; cCha.textContent = p.challenge;
+    } else {
+      s1.hidden = true; cCur.hidden = true; s2.hidden = true; cCha.hidden = true;
+    }
+
+    /* 1-3 작성자 정보 — 1-3-2 닉네임 + 1-3-3 멤버 태그(관리자가 명단 관리에서 입력한 이름) */
+    document.getElementById('pMaker').textContent = p.maker + (p.memberName ? `(${p.memberName})` : '');
+    document.getElementById('pAvatar').textContent = p.avatar;
+    document.getElementById('pDate').textContent = p.date;
+
+    /* 1-6 본문 */
+    document.getElementById('pBody').textContent = p.body;
+    document.getElementById('bodyLen').textContent = `본문 ${p.body.length}자 / 500자 (데모 표시)`;
+
+    /* 1-10 고정핀 / 1-11 챌린지 버튼 */
+    document.getElementById('pinBtn').classList.toggle('on', !!p.pinned);
+    document.getElementById('challBtn').hidden = (p.type === 'my');
+
+    /* 1-2 댓글 숨김 해제 — 관리자가 숨긴 댓글이 있을 때만 노출 */
+    syncUnhideBtn();
+
+    renderComments();
+    document.getElementById('prevBtn').disabled = cur===0;
+    document.getElementById('nextBtn').disabled = cur===projects.length-1;
+    showMedia(0);
+    document.getElementById('railScroll').scrollTop = 0;
+  }
+
+  /* 1-7~1-9 댓글 렌더
+     - 관리자가 숨긴 댓글(hiddenByAdmin): 목록에서 제외, 1-2 버튼으로 일괄 복원
+     - 게시물 작성자(아이)가 앱에서 숨긴 댓글: 애초에 응답에 포함되지 않음 → 목록에 없음 */
+  function renderComments(){
+    const p = projects[cur];
+    const visible = p.comments.filter(c=>!c.hiddenByAdmin);
+    document.getElementById('cmtHead').innerHTML = `댓글 <b>${visible.length}</b>`;
+    document.getElementById('cmts').innerHTML = visible.map(c=>{
+      const ci = p.comments.indexOf(c);
+      /* 1-7-2 닉네임 + 1-7-2 이름(관리자 미입력 시 미노출) */
+      const who = esc(c.name) + (c.memberName ? `(${esc(c.memberName)})` : '');
+      /* 1-8 작성자가 숨긴 댓글 — 내용 대신 안내 문구 출력, 1-2 대상 아님 */
+      const text = c.hiddenByAuthor ? '🙂 게시물 작성자에 의해 숨겨진 댓글이에요.' : esc(c.text);
+      return `<div class="cmt${c.hiddenByAuthor?' byAuthor':''}">
+        <div class="cAvatar">${c.avatar}</div>
+        <div class="cBody">
+          <div class="cHead">${who}<span class="cDate">${c.date}</span></div>
+          <p>${text}</p>
+        </div>
+        <div class="moreWrap">
+          <button class="cMore" onclick="toggleMenu('cm${ci}')" aria-label="댓글 더보기">⋮</button>
+          <div class="menu" id="cm${ci}" hidden>
+            <button onclick="hideComment(${ci})">댓글 숨기기</button>
+            <button onclick="act('멤버 정보 보기 → 멤버 상세 보기 화면')">멤버 정보 보기</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  function syncUnhideBtn(){
+    document.getElementById('unhideBtn').hidden = !projects[cur].comments.some(c=>c.hiddenByAdmin);
+  }
+  /* 1-9-1 댓글 숨기기 — 확인 모달 없이 즉시 숨김 (뮤지엄 내에서만, 앱에는 영향 없음) */
+  function hideComment(ci){
+    closeAllMenus();
+    projects[cur].comments[ci].hiddenByAdmin = true;
+    renderComments(); syncUnhideBtn();
+    toast('댓글 숨김 — 뮤지엄에서만 숨겨지고 아이들 앱에는 영향 없음');
+  }
+  /* 1-2 숨김 해제 — 일괄·단방향. 해제 후 숨겨진 댓글이 없으므로 버튼도 사라짐 */
+  function doUnhide(){
+    projects[cur].comments.forEach(c=>{ c.hiddenByAdmin = false; });
+    renderComments(); syncUnhideBtn();
+    toast('숨겨진 댓글 일괄 숨김 해제');
+  }
+
+  /* 1-13~1-16 미디어 */
+  function showMedia(mi){
+    const p = projects[cur];
+    const n = p.media.length;
+    mCur = (mi + n) % n;
+    const img = document.getElementById('stageImg');
+    const vid = document.getElementById('stageVid');
+    if (p.video){
+      img.hidden = true; vid.hidden = false;
+      if (vid.dataset.src !== p.media[mCur]){
+        vid.src = p.media[mCur]; vid.dataset.src = p.media[mCur];
+        if (p.poster) vid.poster = p.poster;
+      }
+    } else {
+      if (!vid.hidden){ vid.pause(); vid.hidden = true; }
+      img.hidden = false; img.src = p.media[mCur];
+    }
+    /* 1-14 영상 길이 */
+    const db = document.getElementById('durBadge');
+    db.hidden = !p.video; if (p.video) db.textContent = p.duration || '0:00';
+    /* 1-15 미디어 이동 · 1-16 인디케이터 — 2장 이상일 때만, 이미지 바깥 하단 */
+    document.getElementById('mediaCtrl').hidden = n < 2;
+    document.getElementById('mediaBox').classList.toggle('hasCtrl', n >= 2);
+    document.getElementById('dots').innerHTML = n < 2 ? '' : p.media.map((_,di)=>
+      `<button class="${di===mCur?'on':''}" aria-label="${di+1}번째 미디어" onclick="showMedia(${di})"></button>`).join('');
+  }
+  function go(d){ showProject(cur+d); }
+
+  /* 1-10 고정핀 (운영자 로컬 state) */
+  function togglePin(){
+    const p = projects[cur];
+    p.pinned = !p.pinned;
+    document.getElementById('pinBtn').classList.toggle('on', p.pinned);
+    act(p.pinned ? '게시물 고정 — 큐레이션 내 첫 번째로 배치' : '고정 해제 — 업로드 날짜순(최신순)으로 재배치');
+  }
+
+  /* 1-4 / 1-9 더보기 메뉴 */
+  function closeAllMenus(){ document.querySelectorAll('.menu').forEach(m=>m.hidden = true); }
+  function toggleMenu(id){
+    const m = document.getElementById(id);
+    const was = m.hidden;
+    closeAllMenus();
+    m.hidden = !was;
+    event.stopPropagation();
+  }
+  document.addEventListener('click', e=>{ if(!e.target.closest('.moreWrap')) closeAllMenus(); });
+  function act(msg){ closeAllMenus(); toast(msg); }
+
+  /* ===== 확대: 휠·트랙패드 핀치 + 드래그 이동 (이미지만 확대) ===== */
+  const stage = document.querySelector('.mediaStage');
+  const zt = document.getElementById('zoomTarget');
+  let zs = 1, ztx = 0, zty = 0;
+  function applyZoom(){
+    zt.style.transform = zs === 1 ? '' : `translate(${ztx}px, ${zty}px) scale(${zs})`;
+    zt.classList.toggle('grab', zs > 1);
+  }
+  function resetZoom(){ zs = 1; ztx = 0; zty = 0; applyZoom(); }
+  function clampPan(){
+    const sr = stage.getBoundingClientRect(), r = zt.getBoundingClientRect();
+    const W = zt.offsetWidth, H = zt.offsetHeight;
+    const bx = (r.left - ztx) - sr.left, by = (r.top - zty) - sr.top;  // 변환 전 좌상단
+    ztx = Math.max(-(bx + W * zs - 80), Math.min(sr.width  - bx - 80, ztx));
+    zty = Math.max(-(by + H * zs - 80), Math.min(sr.height - by - 80, zty));
+  }
+  stage.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const r = zt.getBoundingClientRect();
+    const bx = r.left - ztx, by = r.top - zty;
+    const px = (e.clientX - bx - ztx) / zs, py = (e.clientY - by - zty) / zs;
+    const factor = e.ctrlKey ? Math.exp(-e.deltaY / 100) : (e.deltaY < 0 ? 1.15 : 1/1.15);
+    const ns = Math.min(3, Math.max(1, zs * factor));
+    ztx = (e.clientX - bx) - ns * px;
+    zty = (e.clientY - by) - ns * py;
+    zs = ns;
+    if (zs === 1){ ztx = 0; zty = 0; } else clampPan();
+    applyZoom();
+  }, {passive:false});
+  let drag = null;
+  zt.addEventListener('mousedown', e=>{
+    if (zs === 1) return;
+    /* 영상은 하단 컨트롤(약 48px) 위에서만 드래그 제외 — 그 밖의 영역은 이미지와 동일하게 이동 */
+    const v = e.target.closest('video');
+    if (v){
+      const r = v.getBoundingClientRect();
+      const localY = (e.clientY - r.top) / zs;      // 확대 배율 보정
+      if (localY > v.offsetHeight - 48) return;
+    }
+    drag = {x:e.clientX, y:e.clientY, tx:ztx, ty:zty};
+    zt.classList.add('grabbing');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{
+    if (!drag) return;
+    ztx = drag.tx + (e.clientX - drag.x);
+    zty = drag.ty + (e.clientY - drag.y);
+    clampPan(); applyZoom();
+  });
+  window.addEventListener('mouseup', ()=>{ drag = null; zt.classList.remove('grabbing'); });
+  zt.addEventListener('dblclick', resetZoom);
+
+  document.addEventListener('keydown', e=>{
+    if (ov.hidden) return;
+    if (e.key==='Escape') closeViewer();
+    if (e.key==='ArrowLeft') go(-1);
+    if (e.key==='ArrowRight') go(1);
+  });
+  let toastTimer;
+  function toast(msg){
+    let t=document.querySelector('.toast');
+    if(!t){
+      t=document.createElement('div'); t.className='toast'; document.body.appendChild(t);
+      t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#26221C;color:#fff;font-size:13px;padding:9px 16px;border-radius:999px;z-index:99;box-shadow:0 6px 18px rgba(0,0,0,.25)';
+    }
+    t.textContent=msg; clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.remove(), 2600);
+  }
+</script>
