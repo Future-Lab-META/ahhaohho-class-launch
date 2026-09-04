@@ -11,7 +11,7 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
     font-size:15px;line-height:1.65}
-  .wrap{max-width:840px;margin:0 auto;padding:44px 22px 72px}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 22px 72px}
   .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
   h1{font-size:27px;line-height:1.32;margin:8px 0 10px;font-weight:700}
   .lede{color:var(--soft);margin:0 0 30px}
@@ -20,13 +20,13 @@
   .list{display:flex;flex-direction:column;gap:9px}
   a.item{
     display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
-    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
     transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   }
   a.item:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(38,34,28,.09);border-color:#DCCFB8}
-  a.item .ico{width:30px;height:30px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--accent-soft)}
+  a.item .ico{width:32px;height:32px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--accent-soft)}
   a.item .tx{min-width:0;flex:1}
-  a.item b{display:block;font-size:14.5px;font-weight:600}
+  a.item b{display:block;font-size:15px;font-weight:600}
   a.item span{display:block;font-size:12.5px;color:var(--soft)}
   a.item .go{font-size:13px;color:var(--soft);flex:none}
   .tag{display:inline-block;background:var(--accent-soft);color:#B34505;border:1px solid #F5C9A6;
@@ -39,36 +39,20 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">아하오호 클래스 · 정식 출시</div>
-  <h1>클래스 정식 출시 기획 산출물</h1>
-  <p class="lede">클래스 웹(교사용) 정식 출시 일감 중 <b>프로젝트 상세 모달 전체 화면 전환</b> 기획 산출물.
-  프로토타입은 링크를 열면 바로 동작하며, 기준 해상도는 1280×800(LG 그램 14 · 배율 100%)임.</p>
+  <h1>프로젝트 상세 모달 → 전체 화면</h1>
+  <p class="lede">갤러리에서 아이 작품(이미지·영상)이 작게 보이는 문제 개선.
+  VOC와 현장 우회 사용 관찰(배율 축소·F11·화면 캡쳐 후 확대)을 근거로 모달을 전체 화면으로 전환하는 기획.
+  기준 해상도는 1280×800(LG 그램 14 · 배율 100%)임.</p>
 
-  <h2>전체 배경</h2>
-  <p class="sub">일감별 기획서를 보기 전에 읽으면 목적과 우선순위 판단 근거를 알 수 있음</p>
-  <div class="list">
-    <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/1pager_%ED%81%B4%EB%9E%98%EC%8A%A4_%EC%A0%95%EC%8B%9D%EC%B6%9C%EC%8B%9C.md">
-      <span class="ico">📄</span>
-      <span class="tx"><b>클래스 정식 출시 1-pager</b><span>목적 · 가설 · KPI — 교사 여정 4단계로 일감 재배치</span></span>
-      <span class="go">→</span>
-    </a>
-  </div>
-
-  <h2>프로젝트 상세 모달 → 전체 화면<span class="tag">기획 완료</span></h2>
-  <p class="sub">갤러리에서 아이 작품(이미지·영상)이 작게 보이는 문제 — VOC + 우회 사용 관찰 기반</p>
   <div class="list">
     <a class="item" href="프로젝트_상세모달_전체화면_개선/시안_프로젝트상세_전체화면.html">
       <span class="ico">🖥️</span>
       <span class="tx"><b>인터랙티브 시안</b><span>작품 넘기기 · 휠·핀치 확대 · 미디어 2장 · 영상 · 본문 500자 · 댓글 스크롤 모두 동작</span></span>
       <span class="go">열기 →</span>
     </a>
-    <a class="item" href="프로젝트_상세모달_전체화면_개선/번호 표기 화면/callout_all.png">
-      <span class="ico">🔢</span>
-      <span class="tx"><b>번호 표기 화면</b><span>구성요소 1-1~1-18 위치와 이름 (1280×800 · 2배 캡쳐)</span></span>
-      <span class="go">열기 →</span>
-    </a>
-    <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%EC%83%81%EC%84%B8%EB%AA%A8%EB%8B%AC_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4_%EA%B0%9C%EC%84%A0/%EB%B3%80%EA%B2%BD%EA%B8%B0%ED%9A%8D_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%83%81%EC%84%B8_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4.md">
+    <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%EC%83%81%EC%84%B8%EB%AA%A8%EB%8B%AC_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4_%EA%B0%9C%EC%84%A0/%EA%B8%B0%ED%9A%8D%EC%84%9C_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%83%81%EC%84%B8_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4.md">
       <span class="ico">📐</span>
-      <span class="tx"><b>변경 기획서 (개발사 전달용)</b><span>배경·목적 · 레이아웃 수식 · 예외 처리 · 인수 기준 10항목</span></span>
+      <span class="tx"><b>기획서</b><span>배경·목적 · 구성요소 1-1~1-18 · 레이아웃 수식 · 예외 처리 · 인수 기준 10항목</span></span>
       <span class="go">→</span>
     </a>
   </div>
@@ -76,7 +60,6 @@
   <div class="note">
     <b>참고</b> — 프로토타입의 이미지·영상은 실제 프로젝트 리소스이며, 본문·댓글·큐레이션명·챌린지명은 레이아웃 검증용 예시임.
     멤버 실명이 노출되는 기존 기획서·현행 화면 캡쳐는 이 저장소에 포함하지 않았고, 로컬 작업 폴더에만 보관됨.
-    아하오호 화면 보기 일감은 기획서 작성 후 추가 예정.
   </div>
 
   <footer>디지털창의환경팀 · 문의는 김하경(하디)</footer>
