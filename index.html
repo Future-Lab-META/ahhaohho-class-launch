@@ -11,7 +11,7 @@
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
     font-size:15px;line-height:1.65}
-  .wrap{max-width:760px;margin:0 auto;padding:44px 22px 72px}
+  .wrap{max-width:780px;margin:0 auto;padding:44px 22px 72px}
   .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
   h1{font-size:27px;line-height:1.32;margin:8px 0 10px;font-weight:700}
   .lede{color:var(--soft);margin:0 0 30px}
@@ -31,6 +31,7 @@
   a.item .go{font-size:13px;color:var(--soft);flex:none}
   .tag{display:inline-block;background:var(--accent-soft);color:#B34505;border:1px solid #F5C9A6;
     border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;margin-left:6px;vertical-align:1px}
+  .tag.wip{background:#EFF3F7;color:#4A6B8A;border-color:#D3E0EC}
   .note{background:#FFF9F2;border:1px solid #F2E3CE;border-radius:12px;padding:14px 16px;font-size:13px;color:#6B5B44;margin-top:30px}
   .note b{color:#8A6A33}
   footer{margin-top:34px;padding-top:15px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}
@@ -39,21 +40,27 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">아하오호 클래스 · 정식 출시</div>
-  <h1>프로젝트 상세 모달 → 전체 화면</h1>
-  <p class="lede">갤러리에서 아이 작품(이미지·영상)이 작게 보이는 문제 개선.
-  VOC와 현장 우회 사용 관찰(배율 축소·F11·화면 캡쳐 후 확대)을 근거로 모달을 전체 화면으로 전환하는 기획.
-  기준 해상도는 1280×800(LG 그램 14 · 배율 100%)임.</p>
+  <h1>클래스 정식 출시 기획 산출물</h1>
+  <p class="lede">클래스 웹(교사용) 정식 출시 관련 기획 문서와 프로토타입.
+  프로토타입은 링크를 열면 바로 동작하며, 기준 해상도는 1280×800(LG 그램 14 · 배율 100%)임.</p>
 
+  <h2>전체 배경</h2>
+  <p class="sub">일감별 기획서를 보기 전에 읽으면 목적과 우선순위 판단 근거를 알 수 있음</p>
+  <div class="list">
+    <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/1pager_%ED%81%B4%EB%9E%98%EC%8A%A4_%EC%A0%95%EC%8B%9D%EC%B6%9C%EC%8B%9C.md">
+      <span class="ico">📄</span>
+      <span class="tx"><b>클래스 정식 출시 1-pager</b><span>목표·KR · 배경 · 가설과 검증 전략 · 원칙 · KPI</span></span>
+      <span class="go">→</span>
+    </a>
+  </div>
+
+  <h2>① 프로젝트 상세 모달 → 전체 화면<span class="tag">기획 완료</span></h2>
+  <p class="sub">갤러리에서 아이 작품(이미지·영상)이 작게 보이는 문제 — VOC + 우회 사용 관찰 기반</p>
   <div class="list">
     <a class="item" href="프로젝트_상세모달_전체화면_개선/시안_프로젝트상세_전체화면.html">
       <span class="ico">🖥️</span>
       <span class="tx"><b>인터랙티브 시안</b><span>작품 넘기기 · 휠·핀치 확대 · 미디어 2장 · 영상 · 본문 500자 · 댓글 스크롤 모두 동작</span></span>
       <span class="go">열기 →</span>
-    </a>
-    <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/1pager_%ED%81%B4%EB%9E%98%EC%8A%A4_%EC%A0%95%EC%8B%9D%EC%B6%9C%EC%8B%9C.md">
-      <span class="ico">📄</span>
-      <span class="tx"><b>클래스 정식 출시 1-pager</b><span>목표·KR · 배경 · 가설과 검증 전략 · 원칙 · KPI</span></span>
-      <span class="go">→</span>
     </a>
     <a class="item" href="https://github.com/Future-Lab-META/ahhaohho-class-launch/blob/main/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%EC%83%81%EC%84%B8%EB%AA%A8%EB%8B%AC_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4_%EA%B0%9C%EC%84%A0/%EA%B8%B0%ED%9A%8D%EC%84%9C_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%83%81%EC%84%B8_%EC%A0%84%EC%B2%B4%ED%99%94%EB%A9%B4.md">
       <span class="ico">📐</span>
@@ -62,9 +69,18 @@
     </a>
   </div>
 
+  <h2>② 아하오호 화면 보기 → 전체 화면<span class="tag wip">논의 중</span></h2>
+  <p class="sub">교사가 아이들의 챌린지 화면을 확인하는 팝업 — 기본 배율에서 UI가 잘리는 문제</p>
+  <div class="list">
+    <a class="item" href="화면보기_전체화면_개선/시안_아하오호화면보기_전체화면.html">
+      <span class="ico">🖥️</span>
+      <span class="tx"><b>인터랙티브 시안</b><span>앱 화면 구성을 유지한 전체 화면 + 확대 방식 3안 비교</span></span>
+      <span class="go">열기 →</span>
+    </a>
+  </div>
+
   <div class="note">
     <b>참고</b> — 프로토타입의 이미지·영상은 실제 프로젝트 리소스이며, 본문·댓글·큐레이션명·챌린지명은 레이아웃 검증용 예시임.
-    멤버 실명이 노출되는 기존 기획서·현행 화면 캡쳐는 이 저장소에 포함하지 않았고, 로컬 작업 폴더에만 보관됨.
   </div>
 
   <footer>디지털창의환경팀 · 문의는 김하경(하디)</footer>
