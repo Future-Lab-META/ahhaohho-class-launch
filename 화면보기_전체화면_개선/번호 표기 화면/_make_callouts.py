@@ -54,10 +54,10 @@ FRAMES = [
         co={
             '1':      {'sel': '#gStep', 'at': 'left', 'dx': -66, 'label': '페이지네이션'},
             '2':      {'sel': '#gImgPane', 'at': 'center', 'label': '가이드 이미지/영상', 'tone': 'blue'},
-            '3':      {'sel': '#gSnd', 'at': 'right', 'dx': 62, 'label': '사운드 on/off', 'tone': 'blue'},
+            '3':      {'sel': '#gSnd', 'at': 'left', 'dx': -72, 'dy': -40, 'label': '사운드 on/off', 'tone': 'blue'},
             '4':      {'sel': '#gCap', 'at': 'left', 'dx': -60, 'label': '가이드 설명', 'tone': 'blue'},
             '8':      {'sel': '#guideCtrl', 'at': 'left', 'dx': -74, 'label': '페이지 이동(카드 밖)', 'tone': 'green'},
-            '공통 6':  {'sel': '#gImgPane', 'at': 'left', 'dx': -78, 'dy': -150, 'label': '확대(휠·핀치)', 'tone': 'green'},
+            '공통 6':  {'sel': '#gImgPane', 'at': 'left', 'dx': -78, 'label': '확대(휠·핀치)', 'tone': 'green'},
             '공통 4':  {'sel': '#stepList', 'at': 'left', 'dx': -74, 'label': '진행 단계', 'tone': 'blue'},
         },
     ),

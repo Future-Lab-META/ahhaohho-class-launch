@@ -195,22 +195,19 @@
   #s1 .step{font-size:clamp(13px,2.6cqh,19px);font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.22);white-space:nowrap}
   #s1 .bar{flex:1;height:clamp(9px,1.9cqh,16px);background:#3B3630;border-radius:999px;overflow:hidden}
   #s1 .bar i{display:block;height:100%;width:24%;background:var(--lime);border-radius:999px;transition:width .25s ease}
-  #s1 .imgBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden;position:relative}
-  /* 사운드 on/off — sound=true인 가이드 페이지에만 출력, 기본값 off */
+  #s1 .imgBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+  /* 이미지 비율이 페이지마다 달라 박스가 아닌 '이미지'에 맞는 래퍼가 필요함 */
+  #s1 .imgWrap{position:relative;display:flex;max-width:100%;max-height:100%;min-height:0}
+  /* 사운드 on/off — sound=true인 가이드 페이지에만 출력, 기본값 off.
+     실제 디자인과 동일하게 미디어 좌상단, 상태는 아이콘으로만 구분(off = 음소거 스피커) */
   #s1 .sndBtn{
-    position:absolute;right:1.6cqw;top:1.6cqh;z-index:2;
+    position:absolute;left:1.6cqw;top:1.6cqh;z-index:2;
     width:clamp(28px,6cqh,42px);aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;
-    background:rgba(20,17,14,.5);backdrop-filter:blur(4px);color:#fff;
+    background:rgba(20,17,14,.42);backdrop-filter:blur(4px);color:#fff;
     font-size:clamp(12px,2.6cqh,18px);display:flex;align-items:center;justify-content:center;
   }
-  #s1 .sndBtn:hover{background:rgba(20,17,14,.7)}
-  #s1 .sndBtn.on{background:var(--lime);color:#26221C}
-  #s1 .sndNow{
-    position:absolute;right:1.6cqw;top:calc(1.6cqh + clamp(32px,6.8cqh,48px));z-index:2;
-    background:rgba(20,17,14,.5);backdrop-filter:blur(4px);color:#fff;border-radius:999px;
-    padding:.5cqh 1.4cqw;font-size:clamp(9px,1.8cqh,12px);font-weight:700;white-space:nowrap;
-  }
-  #s1 .imgBox img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;display:block}
+  #s1 .sndBtn:hover{background:rgba(20,17,14,.62)}
+  #s1 .imgWrap img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;display:block}
   #s1 .side{flex:none;align-items:center;justify-content:center;text-align:center;gap:1.4cqh;padding-bottom:.6cqh}
   /* 캡션은 최대 85자 → 3줄까지 들어갈 높이를 미리 확보(이미지가 그만큼 양보) */
   #s1 .caption{font-size:clamp(13px,2.5cqh,19px);font-weight:700;line-height:1.55;min-height:calc(3 * 1.55em);display:flex;align-items:center;justify-content:center}
@@ -432,10 +429,11 @@
           <div class="prog"><span class="step" id="gStep">1번째</span><div class="bar"><i id="gBar"></i></div></div>
           <div class="split">
             <div class="pane imgBox" id="gImgPane">
-              <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
-              <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
-              <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">🔈</button>
-              <span class="sndNow" id="gSndNow" hidden>재생 중</span>
+              <div class="imgWrap" id="gImgWrap">
+                <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
+                <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
+                <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">🔇</button>
+              </div>
             </div>
             <div class="pane side" id="gSidePane">
               <div class="caption" id="gCap"></div>
@@ -805,9 +803,7 @@
     stopTone();                                  // 이전 페이지 사운드 정지
     const playing = !!(g.sound && soundOn);
     if (playing) playTone(g.tone);
-    btn.textContent = soundOn ? '🔊' : '🔈';
-    btn.classList.toggle('on', soundOn);
-    document.getElementById('gSndNow').hidden = !playing;
+    btn.textContent = playing ? '🔊' : '🔇';
   }
   function toggleSound(){ soundOn = !soundOn; syncSound(); }
   function guide(d){
