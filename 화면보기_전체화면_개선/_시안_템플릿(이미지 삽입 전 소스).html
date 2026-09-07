@@ -207,6 +207,13 @@
     font-size:clamp(12px,2.6cqh,18px);display:flex;align-items:center;justify-content:center;
   }
   #s1 .sndBtn:hover{background:rgba(20,17,14,.62)}
+  #s1 .sndBtn svg{width:58%;height:58%;display:block;overflow:visible}
+  #s1 .sndBtn .spk{fill:#fff}
+  #s1 .sndBtn .wave path{fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
+  /* 음소거 사선 — 좌하 → 우상 방향 */
+  #s1 .sndBtn .slash{stroke:#FF3B30;stroke-width:2.6;stroke-linecap:round}
+  #s1 .sndBtn.on .slash{display:none}
+  #s1 .sndBtn:not(.on) .wave{display:none}
   #s1 .imgWrap img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;display:block}
   #s1 .side{flex:none;align-items:center;justify-content:center;text-align:center;gap:1.4cqh;padding-bottom:.6cqh}
   /* 캡션은 최대 85자 → 3줄까지 들어갈 높이를 미리 확보(이미지가 그만큼 양보) */
@@ -432,7 +439,16 @@
               <div class="imgWrap" id="gImgWrap">
                 <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
                 <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
-                <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">🔇</button>
+                <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path class="spk" d="M4 9.2h3.4L12.4 5v14l-5-4.2H4z"/>
+                    <g class="wave">
+                      <path d="M15.8 9.4a3.8 3.8 0 0 1 0 5.2"/>
+                      <path d="M18.4 7.2a7.2 7.2 0 0 1 0 9.6"/>
+                    </g>
+                    <line class="slash" x1="4.6" y1="19.4" x2="19.4" y2="4.6"/>
+                  </svg>
+                </button>
               </div>
             </div>
             <div class="pane side" id="gSidePane">
@@ -803,7 +819,7 @@
     stopTone();                                  // 이전 페이지 사운드 정지
     const playing = !!(g.sound && soundOn);
     if (playing) playTone(g.tone);
-    btn.textContent = playing ? '🔊' : '🔇';
+    btn.classList.toggle('on', playing);   // on = 스피커 웨이브 / off = 빨간 사선
   }
   function toggleSound(){ soundOn = !soundOn; syncSound(); }
   function guide(d){
