@@ -195,7 +195,21 @@
   #s1 .step{font-size:clamp(13px,2.6cqh,19px);font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.22);white-space:nowrap}
   #s1 .bar{flex:1;height:clamp(9px,1.9cqh,16px);background:#3B3630;border-radius:999px;overflow:hidden}
   #s1 .bar i{display:block;height:100%;width:24%;background:var(--lime);border-radius:999px;transition:width .25s ease}
-  #s1 .imgBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+  #s1 .imgBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden;position:relative}
+  /* 사운드 on/off — sound=true인 가이드 페이지에만 출력, 기본값 off */
+  #s1 .sndBtn{
+    position:absolute;right:1.6cqw;top:1.6cqh;z-index:2;
+    width:clamp(28px,6cqh,42px);aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(20,17,14,.5);backdrop-filter:blur(4px);color:#fff;
+    font-size:clamp(12px,2.6cqh,18px);display:flex;align-items:center;justify-content:center;
+  }
+  #s1 .sndBtn:hover{background:rgba(20,17,14,.7)}
+  #s1 .sndBtn.on{background:var(--lime);color:#26221C}
+  #s1 .sndNow{
+    position:absolute;right:1.6cqw;top:calc(1.6cqh + clamp(32px,6.8cqh,48px));z-index:2;
+    background:rgba(20,17,14,.5);backdrop-filter:blur(4px);color:#fff;border-radius:999px;
+    padding:.5cqh 1.4cqw;font-size:clamp(9px,1.8cqh,12px);font-weight:700;white-space:nowrap;
+  }
   #s1 .imgBox img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;display:block}
   #s1 .side{flex:none;align-items:center;justify-content:center;text-align:center;gap:1.4cqh;padding-bottom:.6cqh}
   /* 캡션은 최대 85자 → 3줄까지 들어갈 높이를 미리 확보(이미지가 그만큼 양보) */
@@ -330,7 +344,7 @@
 
   <h2>데모</h2>
   <p class="sub">챌린지 썸네일을 클릭하면 전체 화면 보기로 진입함. 우측 <b>진행 단계</b>로 4개 단계(개요·가이드 자세히 보기·기록하기·프로젝트 돌아보기)를 바로 이동할 수 있고, <b>스테이지 좌우 화살표</b>는 단계 안의 페이지까지 순서대로 지나감(개요의 아하's Pick 3장 → 가이드 페이지 → 기록하기 → 돌아보기).
-  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
+  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. 가이드 이미지 우상단의 <b>사운드 on/off</b>는 기본 off이며, 켠 뒤 페이지를 넘기면 <b>이전 페이지 소리가 끊기고 새 페이지 소리로 바뀜</b>(on 상태는 유지). <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
   <div class="thumbs">
     <button class="thumb" onclick="openViewer(this)">
       <div class="art"><img src="{{THUMB1}}" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
@@ -420,6 +434,8 @@
             <div class="pane imgBox" id="gImgPane">
               <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
               <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
+              <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">🔈</button>
+              <span class="sndNow" id="gSndNow" hidden>재생 중</span>
             </div>
             <div class="pane side" id="gSidePane">
               <div class="caption" id="gCap"></div>
@@ -611,11 +627,11 @@
     if (btn) applyChallenge(btn.querySelector('.meta b').textContent,
                             btn.querySelector('.meta span').textContent,
                             btn.querySelector('img').src);
-    ov.hidden = false; stack.length = 0; cur = 0; pCur = 0; gCur = 0; ahaCur = 0;
+    ov.hidden = false; stack.length = 0; cur = 0; pCur = 0; gCur = 0; ahaCur = 0; soundOn = false;
     document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
     setTab('view'); document.body.style.overflow='hidden';
   }
-  function closeViewer(){ ov.hidden = true; stack.length = 0; document.body.style.overflow=''; resetZoom(); }
+  function closeViewer(){ ov.hidden = true; stack.length = 0; stopTone(); document.body.style.overflow=''; resetZoom(); }
 
   /* ===== 챌린지 상세 모달 스택 =====
      수업 정보의 추천 챌린지를 누르면 그 챌린지의 모달이 동일한 전체 화면으로 위에 겹쳐 열림.
@@ -635,7 +651,7 @@
     applyChallenge(card.querySelector('b').textContent,
                    card.querySelector('small').textContent,
                    card.querySelector('img').src);
-    cur = 0; pCur = 0; gCur = 0; ahaCur = 0;
+    cur = 0; pCur = 0; gCur = 0; ahaCur = 0; soundOn = false;
     document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
     setTab('view');
   }
@@ -662,6 +678,7 @@
     const isOv = cur === 0, isGuide = cur === 1;
     document.getElementById('guideCtrl').hidden = !isGuide;
     document.getElementById('stageBox').classList.toggle('hasCtrl', isGuide);
+    if (!isGuide) stopTone();                    // 가이드를 벗어나면 사운드 정지
     if (isOv) renderPick();
     if (isGuide) renderGuide();
     updateNav();
@@ -735,8 +752,8 @@
 
   /* 가이드 스텝: 가로 긴 이미지(1003×803) / 세로 긴 이미지(800×1000) 실제 리소스 */
   const gSteps = [
-    {img:'gImgW', cap:'따라 만들고 싶은 캐릭터를 하나 골라보세요.', label:'가로가 긴 이미지 (1003×803)'},
-    {img:'gImgT', cap:'블록을 순서대로 연결해서 나만의 소리를 만들어보세요. 높낮이를 바꾸면 느낌이 완전히 달라지니까 여러 번 바꿔가며 소리를 들어보면 좋아요!', label:'세로가 긴 이미지 (800×1000)'},
+    {img:'gImgW', cap:'따라 만들고 싶은 캐릭터를 하나 골라보세요.', label:'가로가 긴 이미지 (1003×803)', sound:true, tone:392},
+    {img:'gImgT', cap:'블록을 순서대로 연결해서 나만의 소리를 만들어보세요. 높낮이를 바꾸면 느낌이 완전히 달라지니까 여러 번 바꿔가며 소리를 들어보면 좋아요!', label:'세로가 긴 이미지 (800×1000)', sound:true, tone:523},
     /* 마지막 페이지 — 이미지 없이 업로드 안내 문구(API 호출) + 오호 캐릭터 + 기록하기 버튼 */
     {outro:'색이 바뀌는 것처럼 보인 이유를 알아챘어?\n색이 바뀌는 마술을 더 잘 보여주기 위해 손놀림이나 각도를 어떻게 조절했는지도 알려줘.', label:'마무리 · 업로드 안내 + 기록하기'},
   ];
@@ -760,8 +777,39 @@
     document.getElementById('gLabel').textContent = `${gCur+1} / ${gSteps.length} · ${g.label}`;
     document.getElementById('gPrev').toggleAttribute('data-off', gCur === 0);
     document.getElementById('gNext').toggleAttribute('data-off', gCur === last);
+    syncSound();
     updateNav();
   }
+
+  /* ===== 가이드 사운드 on/off =====
+     기본 off. on/off 상태는 페이지를 넘겨도 유지되고(사용자가 off할 때까지),
+     페이지를 넘기는 순간 이전 페이지의 사운드는 즉시 정지됨 → 겹쳐 들리지 않음.
+     시안에서는 페이지마다 다른 음(WebAudio)으로 재생해 동작을 확인할 수 있게 함. */
+  let soundOn = false, actx = null, osc = null;
+  function stopTone(){
+    if (!osc) return;
+    try { osc.stop(); } catch(e){}
+    osc.disconnect(); osc = null;
+  }
+  function playTone(freq){
+    stopTone();
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const g = actx.createGain(); g.gain.value = 0.05;
+    osc = actx.createOscillator(); osc.type = 'sine'; osc.frequency.value = freq;
+    osc.connect(g); g.connect(actx.destination); osc.start();
+  }
+  function syncSound(){
+    const g = gSteps[gCur];
+    const btn = document.getElementById('gSnd');
+    btn.hidden = !g.sound;                       // sound=true인 페이지에만 버튼 출력
+    stopTone();                                  // 이전 페이지 사운드 정지
+    const playing = !!(g.sound && soundOn);
+    if (playing) playTone(g.tone);
+    btn.textContent = soundOn ? '🔊' : '🔈';
+    btn.classList.toggle('on', soundOn);
+    document.getElementById('gSndNow').hidden = !playing;
+  }
+  function toggleSound(){ soundOn = !soundOn; syncSound(); }
   function guide(d){
     gCur = Math.max(0, Math.min(gSteps.length - 1, gCur + d));
     renderGuide();
@@ -782,6 +830,7 @@
     document.getElementById('rail').hidden = !isView;
     document.getElementById('hintView').hidden = !isView;
     document.getElementById('hintInfo').hidden = isView;
+    if (!isView) stopTone();
     if (isView) show(cur); else ci.scrollTop = 0;
   }
 
