@@ -170,12 +170,13 @@
   #s0 .pickArrow.prev{left:2.2cqw}
   #s0 .pickArrow.next{right:2.2cqw}
   #s0 .pickArrow[data-off]{display:none}
+  /* 인디케이터는 현재 위치를 알려주는 시각적 표시 전용 — 앱과 동일하게 클릭 조작 없음 */
   #s0 .pickDots{
     position:absolute;left:50%;bottom:2.4cqh;transform:translateX(-50%);z-index:2;
-    display:flex;align-items:center;gap:1cqw;
+    display:flex;align-items:center;gap:1cqw;pointer-events:none;
     background:rgba(20,17,14,.42);backdrop-filter:blur(4px);border-radius:999px;padding:.9cqh 1.8cqw;
   }
-  #s0 .pickDots i{width:clamp(5px,1.1cqh,8px);height:clamp(5px,1.1cqh,8px);border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:width .18s ease}
+  #s0 .pickDots i{width:clamp(5px,1.1cqh,8px);height:clamp(5px,1.1cqh,8px);border-radius:50%;background:rgba(255,255,255,.45);transition:width .18s ease}
   #s0 .pickDots i.on{width:clamp(13px,2.8cqh,20px);border-radius:999px;background:var(--lime)}
   #s0 .media .byChip{position:absolute;left:4.5cqw;bottom:3.4cqh;background:rgba(26,26,26,.72);color:#fff;font-size:clamp(10px,1.9cqh,14px);font-weight:500;border-radius:8px;padding:.6cqh 1.6cqw;z-index:1}
   #s0 .info{flex:1;padding:2.4cqh 4.4cqw 2.8cqh;gap:1.4cqh}
@@ -348,7 +349,7 @@
 
   <h2>데모</h2>
   <p class="sub">챌린지 썸네일을 클릭하면 전체 화면 보기로 진입함. 우측 <b>진행 단계</b>로 4개 단계(개요·가이드 자세히 보기·기록하기·프로젝트 돌아보기)를 바로 이동할 수 있고, <b>스테이지 좌우 화살표</b>는 단계 안의 페이지까지 순서대로 지나감(개요의 아하's Pick 3장 → 가이드 페이지 → 기록하기 → 돌아보기).
-  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. 가이드 이미지 우상단의 <b>사운드 on/off</b>는 기본 off이며, 켠 뒤 페이지를 넘기면 <b>이전 페이지 소리가 끊기고 새 페이지 소리로 바뀜</b>(on 상태는 유지). <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
+  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. 가이드 이미지 좌상단의 <b>사운드 on/off</b>는 기본 off이며, 켠 뒤 페이지를 넘기면 <b>이전 페이지 소리가 끊기고 새 페이지 소리로 바뀜</b>(on 상태는 유지). <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
   <div class="thumbs">
     <button class="thumb" onclick="openViewer(this)">
       <div class="art"><img data-img="THUMB1" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
@@ -366,7 +367,7 @@
     <div class="rule"><b>2 · 앱 구성 유지 + 높이 우선 contain-fit</b><p>세로 카드의 구성·비율은 그대로 두고, 카드 높이 = <code>100dvh − 56px − 여백</code>으로 화면을 꽉 채움. 높이·폭 어느 쪽이 모자라도 잘리지 않고 통째로 축소 → 어떤 해상도·배율에서도 잘림 0. 기준 해상도 <code>1280×800</code>.</p></div>
     <div class="rule"><b>3 · 확대 — 휠·핀치 + 드래그</b><p>휠 또는 트랙패드 핀치로 커서 위치 기준 1~3배 확대. 확대 시 카드가 프레임을 벗어나 무대(뷰어 영역) 전체를 사용하고, 드래그로 이동, 더블클릭·화면 전환 시 원래 크기로 복귀. 카드 밖의 조작 요소(화면 넘기기 화살표·스텝 이동·조작 안내)는 함께 커지지 않음.</p></div>
     <div class="rule"><b>4 · 조작 요소는 카드 밖에</b><p>가이드 스텝 이동과 아하's Pick 슬라이드 이동(<code>◀ ▶</code>)은 앱 화면 카드 안이 아니라 <b>카드 바깥 하단</b>에 배치 — 앱 화면 구성을 그대로 유지하고, 확대해도 함께 커지지 않음. 조작 안내는 좌하단에 아이콘 + 항목별 한 줄로 상시 노출.</p></div>
-    <div class="rule"><b>6 · 아하's Pick</b><p>개요 화면은 <b>챌린지 썸네일 1장 + 아하's Pick 3장</b>이 같은 영역을 슬라이드로 공유(Pick 1개 이상 지정된 챌린지에만 화살표 노출). 첫 슬라이드는 우측만, 마지막은 좌측만 노출하고, <b>아하의 설명글도 슬라이드에 맞춰 자동 전환</b>. Pick 이미지 위에는 프로젝트 게시자의 프로필·닉네임을 표기하고, 이동 화살표·인디케이터도 앱과 동일하게 <b>이미지 안</b>에 배치(앱 UI이므로 카드와 함께 확대됨).</p></div>
+    <div class="rule"><b>6 · 아하's Pick</b><p>개요 화면은 <b>챌린지 썸네일 1장 + 아하's Pick 3장</b>이 같은 영역을 슬라이드로 공유(Pick 1개 이상 지정된 챌린지에만 화살표 노출). 첫 슬라이드는 우측만, 마지막은 좌측만 노출하고, <b>아하의 설명글도 슬라이드에 맞춰 자동 전환</b>. Pick 이미지 위에는 프로젝트 게시자의 프로필·닉네임을 표기하고, 이동 화살표도 앱과 동일하게 <b>이미지 안</b>에 배치(앱 UI이므로 카드와 함께 확대됨). 인디케이터는 현재 위치 표시 전용이며 클릭 조작이 없음.</p></div>
     <div class="rule"><b>4 · 이미지 비율 대응</b><p>가이드 스텝 이미지는 가로가 긴 것(1003×803)·세로가 긴 것(800×1000)이 혼재 → 이미지 박스 안에서 원본 비율 그대로 <code>contain</code>으로 수용(박스 크기는 고정, 이미지만 맞춤).</p></div>
     <div class="rule"><b>5 · 진행 단계는 우측 레일</b><p>진행 단계는 264px 우측 레일 고정. 단계 클릭으로 해당 화면 바로 이동. <b>수업 정보 탭에서는 레일 없이</b> 문서가 화면 폭을 전부 사용.</p></div>
     <div class="rule"><b>7 · 수업 정보 탭</b><p>현행 2단 구성(좌측 키워드·역량·카테고리·난이도·준비물 / 우측 설명·목표·성취기준·추천·참고자료)을 유지하고 폭만 전체 화면으로 넓힘. 글 중심이라 <b>휠은 위아래 이동, 트랙패드 핀치는 글자 확대</b>로 분리하고, 확대는 <code>transform</code> 대신 <code>zoom</code>을 써서 줄바꿈이 다시 흐르도록 함.</p></div>
@@ -768,7 +769,7 @@
     document.getElementById('pickPrev').toggleAttribute('data-off', pCur === 0);
     document.getElementById('pickNext').toggleAttribute('data-off', pCur === last);
     const dots = document.getElementById('pickDots');
-    dots.innerHTML = pickSlides.map((_,i)=>`<i class="${i===pCur?'on':''}" onclick="pickGo(${i})"></i>`).join('');
+    dots.innerHTML = pickSlides.map((_,i)=>`<i class="${i===pCur?'on':''}"></i>`).join('');
     updateNav();
   }
   function pick(d){ pickGo(Math.max(0, Math.min(pickSlides.length-1, pCur + d))); }
