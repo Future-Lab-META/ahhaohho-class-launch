@@ -1,4 +1,4 @@
-<title>아하오호 화면 보기 개선 시안</title>
+<title>챌린지 상세 보기 모달 전체 화면 개선 시안</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
@@ -335,7 +335,7 @@
 
 <div class="wrap">
   <div class="eyebrow">클래스 웹 · 개선 제안</div>
-  <h1>아하오호 화면 보기, 팝업에서 전체 화면으로</h1>
+  <h1>챌린지 상세 보기 모달, 팝업에서 전체 화면으로</h1>
   <p class="lede">현재는 모달 안에 세로로 긴 카드를 끼워 넣어 뷰어가 작고, 기본 배율(1280×800)에서 UI가 잘림.
   썸네일 클릭 시 같은 탭에서 전체 화면으로 전환하고, <b>앱 화면 구성(세로 카드)은 그대로 유지한 채
   화면 높이를 전부 카드에 주는 안</b>. 휠·트랙패드 핀치로 원하는 부분을 확대해 세부도 크게 볼 수 있음.</p>
@@ -351,11 +351,11 @@
   미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. 가이드 이미지 우상단의 <b>사운드 on/off</b>는 기본 off이며, 켠 뒤 페이지를 넘기면 <b>이전 페이지 소리가 끊기고 새 페이지 소리로 바뀜</b>(on 상태는 유지). <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
   <div class="thumbs">
     <button class="thumb" onclick="openViewer(this)">
-      <div class="art"><img src="{{THUMB1}}" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
+      <div class="art"><img data-img="THUMB1" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
       <div class="meta"><b>두근두근 비밀 상자</b><span>🛠️ 만들기</span></div>
     </button>
     <button class="thumb" onclick="openViewer(this)">
-      <div class="art"><img src="{{THUMB2}}" alt="도둑을 잡아라! 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
+      <div class="art"><img data-img="THUMB2" alt="도둑을 잡아라! 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
       <div class="meta"><b>도둑을 잡아라!</b><span>🛠️ 만들기</span></div>
     </button>
   </div>
@@ -372,7 +372,7 @@
     <div class="rule"><b>7 · 수업 정보 탭</b><p>현행 2단 구성(좌측 키워드·역량·카테고리·난이도·준비물 / 우측 설명·목표·성취기준·추천·참고자료)을 유지하고 폭만 전체 화면으로 넓힘. 글 중심이라 <b>휠은 위아래 이동, 트랙패드 핀치는 글자 확대</b>로 분리하고, 확대는 <code>transform</code> 대신 <code>zoom</code>을 써서 줄바꿈이 다시 흐르도록 함.</p></div>
   </div>
 
-  <footer>레이아웃 검증용 목업 — 실제 서비스 이미지 리소스 사용(썸네일·가이드 이미지), 문구는 예시 · 기준 기기: LG 그램 14 (1920×1200 @150% = 1280×800) · 원본 캡쳐: <code>화면보기_전체화면_개선/현재 팝업 상태(윈도우 화면 90%로 캡쳐)/</code></footer>
+  <footer>레이아웃 검증용 목업 — 실제 서비스 이미지 리소스 사용(썸네일·가이드 이미지), 문구는 예시 · 기준 기기: LG 그램 14 (1920×1200 @150% = 1280×800) · 원본 캡쳐: <code>챌린지_상세보기모달_전체화면_개선/현재 팝업 상태(윈도우 화면 90%로 캡쳐)/</code></footer>
 </div>
 
 <!-- ===== 전체 화면 오버레이 ===== -->
@@ -397,18 +397,18 @@
           <div class="split">
             <div class="pane media">
               <div class="slides" id="s0Slides">
-                <div class="slide on"><img id="s0Thumb" src="{{THUMB1}}" alt="챌린지 대표 이미지"></div>
+                <div class="slide on"><img id="s0Thumb" data-img="THUMB1" alt="챌린지 대표 이미지"></div>
                 <div class="slide">
-                  <img src="{{PICK1}}" alt="아하's Pick 1">
-                  <span class="pickTag"><img src="{{AV1}}" alt=""><b>초록도마뱀</b></span>
+                  <img data-img="PICK1" alt="아하's Pick 1">
+                  <span class="pickTag"><img data-img="AV1" alt=""><b>초록도마뱀</b></span>
                 </div>
                 <div class="slide">
-                  <img src="{{PICK2}}" alt="아하's Pick 2">
-                  <span class="pickTag"><img src="{{AV2}}" alt=""><b>말랑이</b></span>
+                  <img data-img="PICK2" alt="아하's Pick 2">
+                  <span class="pickTag"><img data-img="AV2" alt=""><b>말랑이</b></span>
                 </div>
                 <div class="slide">
-                  <img src="{{PICK3}}" alt="아하's Pick 3">
-                  <span class="pickTag"><img src="{{AV3}}" alt=""><b>뭉치대장</b></span>
+                  <img data-img="PICK3" alt="아하's Pick 3">
+                  <span class="pickTag"><img data-img="THUMB2" alt=""><b>뭉치대장</b></span>
                 </div>
                 <button class="pickArrow prev" id="pickPrev" onclick="pick(-1)" aria-label="이전 슬라이드">◀</button>
                 <button class="pickArrow next" id="pickNext" onclick="pick(1)" aria-label="다음 슬라이드">▶</button>
@@ -437,8 +437,8 @@
           <div class="split">
             <div class="pane imgBox" id="gImgPane">
               <div class="imgWrap" id="gImgWrap">
-                <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
-                <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
+                <img id="gImgW" data-img="GUIDE_W" alt="가이드 이미지(가로가 긴 형태)">
+                <img id="gImgT" data-img="GUIDE_T" alt="가이드 이미지(세로가 긴 형태)" hidden>
                 <button class="sndBtn" id="gSnd" onclick="toggleSound()" aria-label="사운드 켜기/끄기">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path class="spk" d="M4 9.2h3.4L12.4 5v14l-5-4.2H4z"/>
@@ -470,7 +470,7 @@
           <h4>기록하기</h4>
           <div class="split">
             <div class="pane left">
-              <div class="thumbImg"><img id="recThumb" src="{{THUMB1}}" alt="프로젝트 썸네일"></div>
+              <div class="thumbImg"><img id="recThumb" data-img="THUMB1" alt="프로젝트 썸네일"></div>
               <div class="ask">만들면서 제일 재미있었던 순간은 언제였어? 어떤 점이 어려웠는지도 소개해 줘~😉</div>
             </div>
             <div class="pane right">
@@ -533,7 +533,7 @@
               </section>
               <section class="ciSec" id="ci-mat">
                 <h5><svg class="ic" viewBox="0 0 20 20"><path d="M3 7h14v9H3zM6.5 7V4.5h7V7"/></svg>준비물</h5>
-                <div class="ciMat"><img src="{{THUMB2}}" alt="">모바일 기기</div>
+                <div class="ciMat"><img data-img="THUMB2" alt="">모바일 기기</div>
               </section>
             </aside>
             <main class="ciMain">
@@ -561,8 +561,8 @@
                 <h5><svg class="ic" viewBox="0 0 20 20"><path d="M11.5 4.5 15.5 8.5 8 16H4v-4z"/><path d="M10 6 14 10"/></svg>교육자 참고 자료</h5>
                 <div class="ciFiles">
                   <div class="ciFile"><div class="pv"><span>PDF</span></div><b>잠만경 도안(4*4).pdf</b></div>
-                  <div class="ciFile"><div class="pv"><img src="{{GUIDE_W}}" alt=""></div><b>몸 도안(샘플).jpg</b></div>
-                  <div class="ciFile"><div class="pv"><img src="{{GUIDE_T}}" alt=""></div><b>그리는 방법.jpeg</b></div>
+                  <div class="ciFile"><div class="pv"><img data-img="GUIDE_W" alt=""></div><b>몸 도안(샘플).jpg</b></div>
+                  <div class="ciFile"><div class="pv"><img data-img="GUIDE_T" alt=""></div><b>그리는 방법.jpeg</b></div>
                 </div>
                 <div class="ciLinks" style="margin-top:12px">
                   <span>국립생물자원관 - <a href="#" onclick="return false">https://blog.naver.com/nibr_bio/222937240690</a></span>
@@ -576,14 +576,14 @@
               <section class="ciSec" id="ci-rec">
                 <h5><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M7 12.2c.8.9 1.8 1.3 3 1.3s2.2-.4 3-1.3M7.5 8h.4M12.1 8h.4"/></svg>추천 챌린지</h5>
                 <div class="ciRec">
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>그림과 만들기</small><b>쭉! 잡아당겨 그리기</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>소리와 음악</small><b>수다스러운 말렛 만들기</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>놀이와 게임</small><b>연필 뽑기 게임</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>과학과 자연</small><b>물방울 돋보기 만들기</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>몸과 감각</small><b>블라인드 컨투어 드로잉</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>수와 생각</small><b>도전! 패턴 콜렉터</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>그림과 만들기</small><b>콜라주 팝업카드</b></div>
-                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>몸과 감각</small><b>거울 반전 그리기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB1" alt=""></div><small>그림과 만들기</small><b>쭉! 잡아당겨 그리기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB2" alt=""></div><small>소리와 음악</small><b>수다스러운 말렛 만들기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB1" alt=""></div><small>놀이와 게임</small><b>연필 뽑기 게임</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB2" alt=""></div><small>과학과 자연</small><b>물방울 돋보기 만들기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB1" alt=""></div><small>몸과 감각</small><b>블라인드 컨투어 드로잉</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB2" alt=""></div><small>수와 생각</small><b>도전! 패턴 콜렉터</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB1" alt=""></div><small>그림과 만들기</small><b>콜라주 팝업카드</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img data-img="THUMB2" alt=""></div><small>몸과 감각</small><b>거울 반전 그리기</b></div>
                 </div>
               </section>
             </main>
@@ -625,6 +625,16 @@
 </div>
 
 <script>
+  /* 이미지는 여기 한 번만 임베드하고 data-img로 참조 —
+     같은 이미지를 여러 번 src에 박으면 파일 크기가 배로 늘어남 */
+  const IMG = {
+    THUMB1:"{{THUMB1}}", THUMB2:"{{THUMB2}}",
+    GUIDE_W:"{{GUIDE_W}}", GUIDE_T:"{{GUIDE_T}}",
+    PICK1:"{{PICK1}}", PICK2:"{{PICK2}}", PICK3:"{{PICK3}}",
+    AV1:"{{AV1}}", AV2:"{{AV2}}",
+  };
+  document.querySelectorAll('[data-img]').forEach(el => el.src = IMG[el.dataset.img]);
+
   const ov = document.getElementById('ov');
   const N = 4;
   let cur = 0;

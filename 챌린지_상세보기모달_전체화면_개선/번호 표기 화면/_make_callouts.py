@@ -3,7 +3,7 @@
 실행: python3 _make_callouts.py
      → callout.html 생성 후 헤드리스 크롬으로 프레임별 PNG 캡쳐
 
-'아하오호 화면 보기'는 단계(개요·가이드·기록하기·돌아보기)와 탭(화면 보기·수업 정보)이
+'챌린지 상세 보기 모달'은 단계(개요·가이드·기록하기·돌아보기)와 탭(화면 보기·수업 정보)이
 나뉘어 있어 한 화면에 모든 번호를 담을 수 없음 → 프레임을 나눠 캡쳐하고, 번호는
 기존 기획서와 같이 화면별로 매김(같은 번호가 다른 화면에 다시 등장함).
 번호 위치는 레이아웃에서 자동 계산하므로 프로토타입을 수정한 뒤 다시 실행하면 됨.
@@ -12,7 +12,7 @@ import os, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
-VIEWER = os.path.join(HERE, '..', '시안_아하오호화면보기_전체화면.html')
+VIEWER = os.path.join(HERE, '..', '시안_챌린지상세보기_전체화면.html')
 W, H = 1280, 800
 
 CHROME = next((p for p in [
