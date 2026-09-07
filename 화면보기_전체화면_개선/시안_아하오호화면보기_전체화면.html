@@ -155,7 +155,7 @@
   #s0 .slide{position:absolute;inset:0;display:none}
   #s0 .slide.on{display:block}
   #s0 .slide>img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
-  /* 아하's Pick 이미지 위 작성자 표기(프로필 + 닉네임) — 실제 앱과 동일하게 좌상단 */
+  /* 아하's Pick 이미지 위 프로젝트 게시자 표기(프로필 + 닉네임) — 실제 앱과 동일하게 좌상단 */
   #s0 .pickTag{position:absolute;left:2.2cqw;top:2.2cqh;display:flex;align-items:center;gap:1.2cqw;background:rgba(20,17,14,.56);backdrop-filter:blur(6px);border-radius:999px;padding:.7cqh 2cqw .7cqh .7cqh}
   #s0 .pickTag>img{width:clamp(22px,4.8cqh,34px);height:clamp(22px,4.8cqh,34px);border-radius:50%;object-fit:cover;flex:none;display:block}
   #s0 .pickTag>b{color:#fff;font-size:clamp(10px,2cqh,14px);font-weight:700;white-space:nowrap}
@@ -366,7 +366,7 @@
     <div class="rule"><b>2 · 앱 구성 유지 + 높이 우선 contain-fit</b><p>세로 카드의 구성·비율은 그대로 두고, 카드 높이 = <code>100dvh − 56px − 여백</code>으로 화면을 꽉 채움. 높이·폭 어느 쪽이 모자라도 잘리지 않고 통째로 축소 → 어떤 해상도·배율에서도 잘림 0. 기준 해상도 <code>1280×800</code>.</p></div>
     <div class="rule"><b>3 · 확대 — 휠·핀치 + 드래그</b><p>휠 또는 트랙패드 핀치로 커서 위치 기준 1~3배 확대. 확대 시 카드가 프레임을 벗어나 무대(뷰어 영역) 전체를 사용하고, 드래그로 이동, 더블클릭·화면 전환 시 원래 크기로 복귀. 카드 밖의 조작 요소(화면 넘기기 화살표·스텝 이동·조작 안내)는 함께 커지지 않음.</p></div>
     <div class="rule"><b>4 · 조작 요소는 카드 밖에</b><p>가이드 스텝 이동과 아하's Pick 슬라이드 이동(<code>◀ ▶</code>)은 앱 화면 카드 안이 아니라 <b>카드 바깥 하단</b>에 배치 — 앱 화면 구성을 그대로 유지하고, 확대해도 함께 커지지 않음. 조작 안내는 좌하단에 아이콘 + 항목별 한 줄로 상시 노출.</p></div>
-    <div class="rule"><b>6 · 아하's Pick</b><p>개요 화면은 <b>챌린지 썸네일 1장 + 아하's Pick 3장</b>이 같은 영역을 슬라이드로 공유(Pick 1개 이상 지정된 챌린지에만 화살표 노출). 첫 슬라이드는 우측만, 마지막은 좌측만 노출하고, <b>아하의 설명글도 슬라이드에 맞춰 자동 전환</b>. Pick 이미지 위에는 작성자 프로필·닉네임을 표기하고, 이동 화살표·인디케이터도 앱과 동일하게 <b>이미지 안</b>에 배치(앱 UI이므로 카드와 함께 확대됨).</p></div>
+    <div class="rule"><b>6 · 아하's Pick</b><p>개요 화면은 <b>챌린지 썸네일 1장 + 아하's Pick 3장</b>이 같은 영역을 슬라이드로 공유(Pick 1개 이상 지정된 챌린지에만 화살표 노출). 첫 슬라이드는 우측만, 마지막은 좌측만 노출하고, <b>아하의 설명글도 슬라이드에 맞춰 자동 전환</b>. Pick 이미지 위에는 프로젝트 게시자의 프로필·닉네임을 표기하고, 이동 화살표·인디케이터도 앱과 동일하게 <b>이미지 안</b>에 배치(앱 UI이므로 카드와 함께 확대됨).</p></div>
     <div class="rule"><b>4 · 이미지 비율 대응</b><p>가이드 스텝 이미지는 가로가 긴 것(1003×803)·세로가 긴 것(800×1000)이 혼재 → 이미지 박스 안에서 원본 비율 그대로 <code>contain</code>으로 수용(박스 크기는 고정, 이미지만 맞춤).</p></div>
     <div class="rule"><b>5 · 진행 단계는 우측 레일</b><p>진행 단계는 264px 우측 레일 고정. 단계 클릭으로 해당 화면 바로 이동. <b>수업 정보 탭에서는 레일 없이</b> 문서가 화면 폭을 전부 사용.</p></div>
     <div class="rule"><b>7 · 수업 정보 탭</b><p>현행 2단 구성(좌측 키워드·역량·카테고리·난이도·준비물 / 우측 설명·목표·성취기준·추천·참고자료)을 유지하고 폭만 전체 화면으로 넓힘. 글 중심이라 <b>휠은 위아래 이동, 트랙패드 핀치는 글자 확대</b>로 분리하고, 확대는 <code>transform</code> 대신 <code>zoom</code>을 써서 줄바꿈이 다시 흐르도록 함.</p></div>
@@ -753,7 +753,7 @@
     /* 아하 설명글도 슬라이드에 맞춰 자동 전환 — Pick에서는 고정 문구 */
     document.getElementById('s0Bubble').textContent = p.bubble || ahaMsgs[ahaCur];
     document.getElementById('s0Char').toggleAttribute('data-off', pCur !== 0);
-    /* 기획자 표기(by.)는 챌린지 썸네일에만 — Pick은 이미지 위 프로필·닉네임으로 대체 */
+    /* 기획자 표기(by.)는 챌린지 썸네일에만 — Pick은 이미지 위 게시자 표기로 대체 */
     document.querySelector('#s0 .byChip').hidden = pCur !== 0;
     document.getElementById('pickPrev').toggleAttribute('data-off', pCur === 0);
     document.getElementById('pickNext').toggleAttribute('data-off', pCur === last);
