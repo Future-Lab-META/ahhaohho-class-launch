@@ -1,0 +1,858 @@
+<title>아하오호 화면 보기 개선 시안</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+  :root{
+    --paper:#FAF7F1;
+    --ink:#26221C;
+    --ink-soft:#6E6659;
+    --line:#E4DCCF;
+    --card:#FFFFFF;
+    --accent:#F2600C;
+    --accent-soft:#FDEBDD;
+    --lime:#D9E84A;
+    --stage:#2B2721;
+    --stage-ink:#F5F1E8;
+    --stage-soft:#A89F8F;
+    --appfont:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    font-size:15px;line-height:1.65;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+  h1{font-size:30px;line-height:1.3;margin:8px 0 12px;text-wrap:balance;font-weight:700}
+  .lede{color:var(--ink-soft);max-width:640px;margin:0 0 20px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
+  .chip{background:var(--accent-soft);color:#B34505;border:1px solid #F5C9A6;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+  h2{font-size:18px;margin:44px 0 6px;font-weight:700}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 16px}
+
+  /* ---- 썸네일 데모 ---- */
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .thumb{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .thumb:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(38,34,28,.10)}
+  .thumb:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .thumb .art{height:170px;position:relative;overflow:hidden}
+  .thumb .art img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .meta{padding:12px 14px 14px}
+  .thumb .meta b{display:block;font-size:15px}
+  .thumb .meta span{font-size:12.5px;color:var(--ink-soft)}
+  .thumb .play{
+    position:absolute;right:10px;bottom:10px;background:rgba(255,255,255,.92);border-radius:999px;
+    font-size:11.5px;font-weight:700;padding:3px 10px;color:var(--ink);
+  }
+
+  /* ---- 규칙 목록 ---- */
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:8px}
+  .rule{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .rule b{display:block;margin-bottom:4px;font-size:14.5px}
+  .rule p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+  .rule code{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px}
+
+  /* ==== 전체 화면 오버레이 ==== */
+  .overlay{position:fixed;inset:0;background:var(--stage);z-index:50;display:flex;flex-direction:column}
+  .overlay[hidden]{display:none!important}
+  /* 추천 챌린지에서 열린 모달 — 이전 모달 위에 겹쳐 놓인 것으로 보이도록 한 단 들여쓰기 */
+  .overlay.stacked{
+    inset:18px;border-radius:18px;overflow:hidden;
+    box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 100vmax rgba(0,0,0,.5);
+  }
+  .topbar{
+    height:56px;flex:none;display:flex;align-items:center;gap:12px;padding:0 12px 0 8px;
+    background:#221E19;color:var(--stage-ink);border-bottom:1px solid #3A342C;
+  }
+  .topbar .title{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tb-btn{
+    background:none;border:none;color:var(--stage-ink);font:inherit;font-size:13.5px;font-weight:600;
+    border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .tb-btn:hover{background:rgba(255,255,255,.09)}
+  .tb-btn:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+  .tabs{display:flex;gap:2px;margin-left:4px}
+  .tab{background:none;border:none;color:var(--stage-soft);font:inherit;font-size:13.5px;font-weight:600;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  .tab[aria-selected="true"]{color:var(--stage-ink);background:rgba(255,255,255,.10)}
+  .tab:hover{color:var(--stage-ink)}
+  .spacer{flex:1}
+
+  .body{flex:1;display:flex;min-height:0}
+  .viewerArea{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:20px 64px;position:relative;overflow:hidden}
+
+  /* 뷰어 카드: 세로 4:5, 높이 우선 contain-fit — 절대 잘리지 않음 */
+  .device{
+    height:100%;max-height:100%;aspect-ratio:4/5;max-width:100%;
+    border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.45);
+    overflow:hidden;position:relative;background:#fff;
+    container-type:size;
+  }
+
+  /* 화면 전환 화살표 */
+  .navArrow{
+    position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.14);color:var(--stage-ink);font-size:18px;cursor:pointer;
+  }
+  .navArrow:hover{background:rgba(255,255,255,.26)}
+  .navArrow:disabled{opacity:.25;cursor:default}
+  .navArrow.prev{left:12px}.navArrow.next{right:12px}
+  .navArrow{z-index:3}
+
+  /* 확대: 휠·핀치 + 드래그 (앱 화면 카드에 적용, 카드 밖 조작 요소는 확대되지 않음) */
+  .device{will-change:transform;transform-origin:0 0}
+  .device.grab{cursor:grab}
+  .device.grabbing{cursor:grabbing;user-select:none}
+
+  /* 카드 + 카드 밖 조작 요소를 묶는 세로 스택 */
+  .stageBox{height:100%;display:flex;flex-direction:column;align-items:center;gap:10px;min-height:0}
+  .stageBox.hasCtrl .device{height:calc(100% - 44px);max-height:calc(100% - 44px)}
+
+  /* 가이드 스텝 이동 — 카드 바깥 하단 */
+  .guideCtrl{flex:none;display:flex;align-items:center;gap:12px;height:34px}
+  .gBtn{
+    width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.14);color:var(--stage-ink);font-size:13px;
+  }
+  .gBtn:hover{background:rgba(255,255,255,.28)}
+  .gLabel{font-size:12px;color:var(--stage-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .gBtn[data-off]{visibility:hidden}
+
+  /* 조작 안내 */
+  .hintBar{
+    position:absolute;left:12px;bottom:12px;z-index:3;
+    display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+    background:rgba(20,17,14,.6);border-radius:14px;padding:11px 14px;backdrop-filter:blur(8px);
+  }
+  .hint{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--stage-ink);white-space:nowrap}
+  .hint .ic{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+  .hint .key{
+    display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;padding:0 4px;
+    border:1px solid rgba(255,255,255,.4);border-radius:4px;font-size:10.5px;font-weight:700;line-height:1;
+  }
+
+  /* ---- 공통: 화면 레이아웃 (앱 구성 유지 — 세로 스택) ---- */
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;font-family:var(--appfont);color:#26221C}
+  .screen.active{display:flex}
+  .split{flex:1;display:flex;flex-direction:column;min-height:0}
+  .pane{min-width:0;min-height:0;display:flex;flex-direction:column}
+  .btn{
+    border:none;border-radius:12px;cursor:pointer;font-family:inherit;font-weight:700;
+    font-size:clamp(12px,2.4cqh,17px);padding:1.6cqh 3cqw;white-space:nowrap;
+  }
+  .btn.dark{background:#1A1A1A;color:#fff;flex:1}
+  .btn.ghost{background:#fff;color:#26221C;border:1px solid #E3DDD2}
+  .bubble{
+    background:#fff;border:1px solid #EAE4D8;border-radius:14px;padding:1.4cqh 2.4cqw;
+    font-size:clamp(12px,2.3cqh,17px);font-weight:500;line-height:1.5;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.06);
+  }
+
+  /* ---- 1 개요 ---- */
+  #s0{background:#fff}
+  #s0 .media{flex:1.35;background:#F4F2EE;position:relative;padding:2.4cqh 2.4cqw;min-height:0}
+  /* 썸네일 + 아하's Pick 슬라이드 — 같은 영역을 겹쳐 쓰고 .on 하나만 노출 */
+  #s0 .slides{position:relative;width:100%;height:100%}
+  #s0 .slide{position:absolute;inset:0;display:none}
+  #s0 .slide.on{display:block}
+  #s0 .slide>img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+  /* 아하's Pick 이미지 위 작성자 표기(프로필 + 닉네임) — 실제 앱과 동일하게 좌상단 */
+  #s0 .pickTag{position:absolute;left:2.2cqw;top:2.2cqh;display:flex;align-items:center;gap:1.2cqw;background:rgba(20,17,14,.56);backdrop-filter:blur(6px);border-radius:999px;padding:.7cqh 2cqw .7cqh .7cqh}
+  #s0 .pickTag>img{width:clamp(22px,4.8cqh,34px);height:clamp(22px,4.8cqh,34px);border-radius:50%;object-fit:cover;flex:none;display:block}
+  #s0 .pickTag>b{color:#fff;font-size:clamp(10px,2cqh,14px);font-weight:700;white-space:nowrap}
+  /* 슬라이드 이동 화살표·인디케이터 — 앱 화면과 동일하게 이미지 안에 배치(카드와 함께 확대됨) */
+  #s0 .pickArrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+    width:clamp(26px,6cqh,42px);aspect-ratio:1;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(20,17,14,.42);backdrop-filter:blur(4px);color:#fff;font-size:clamp(11px,2.3cqh,16px);
+    display:flex;align-items:center;justify-content:center;
+  }
+  #s0 .pickArrow:hover{background:rgba(20,17,14,.66)}
+  #s0 .pickArrow.prev{left:2.2cqw}
+  #s0 .pickArrow.next{right:2.2cqw}
+  #s0 .pickArrow[data-off]{display:none}
+  #s0 .pickDots{
+    position:absolute;left:50%;bottom:2.4cqh;transform:translateX(-50%);z-index:2;
+    display:flex;align-items:center;gap:1cqw;
+    background:rgba(20,17,14,.42);backdrop-filter:blur(4px);border-radius:999px;padding:.9cqh 1.8cqw;
+  }
+  #s0 .pickDots i{width:clamp(5px,1.1cqh,8px);height:clamp(5px,1.1cqh,8px);border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:width .18s ease}
+  #s0 .pickDots i.on{width:clamp(13px,2.8cqh,20px);border-radius:999px;background:var(--lime)}
+  #s0 .media .byChip{position:absolute;left:4.5cqw;bottom:3.4cqh;background:rgba(26,26,26,.72);color:#fff;font-size:clamp(10px,1.9cqh,14px);font-weight:500;border-radius:8px;padding:.6cqh 1.6cqw;z-index:1}
+  #s0 .info{flex:1;padding:2.4cqh 4.4cqw 2.8cqh;gap:1.4cqh}
+  #s0 .charRow{display:flex;align-items:flex-end;justify-content:flex-end;gap:1.6cqw;margin-top:-4.6cqh;z-index:1}
+  #s0 .char{width:clamp(36px,8cqh,60px);aspect-ratio:1;border-radius:50%;background:#EAF3FA;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,4cqh,30px);flex:none;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  #s0 h4{margin:0;font-size:clamp(18px,4.2cqh,32px);font-weight:900;letter-spacing:-.01em}
+  #s0 .cat{font-size:clamp(12px,2.2cqh,16px);font-weight:500;color:#8A7F6E}
+  #s0 .actions{margin-top:auto;display:flex;gap:1.8cqw}
+
+  /* ---- 2 가이드 자세히 보기 ---- */
+  #s1{background:#E9D7D0;padding:2.4cqh 3cqw;gap:1.8cqh}
+  #s1 .prog{display:flex;align-items:center;gap:2cqw;flex:none}
+  #s1 .step{font-size:clamp(13px,2.6cqh,19px);font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.22);white-space:nowrap}
+  #s1 .bar{flex:1;height:clamp(9px,1.9cqh,16px);background:#3B3630;border-radius:999px;overflow:hidden}
+  #s1 .bar i{display:block;height:100%;width:24%;background:var(--lime);border-radius:999px;transition:width .25s ease}
+  #s1 .imgBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+  #s1 .imgBox img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:8px;display:block}
+  #s1 .side{flex:none;align-items:center;justify-content:center;text-align:center;gap:1.4cqh;padding-bottom:.6cqh}
+  /* 캡션은 최대 85자 → 3줄까지 들어갈 높이를 미리 확보(이미지가 그만큼 양보) */
+  #s1 .caption{font-size:clamp(13px,2.5cqh,19px);font-weight:700;line-height:1.55;min-height:calc(3 * 1.55em);display:flex;align-items:center;justify-content:center}
+  /* 마지막 페이지(마무리) — 기획서 '가이드 자세히 보기 5/5' 구성 */
+  #s1 .outro{flex:1;min-height:0;gap:2cqh}
+  #s1 .outroBody{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.6cqh}
+  #s1 .outro .bubble{max-width:88%;text-align:left;white-space:pre-line;font-size:clamp(12px,2.4cqh,17px);font-weight:500;line-height:1.6;position:relative}
+  #s1 .outro .bubble::after{content:'';position:absolute;left:52%;bottom:-9px;border:9px solid transparent;border-top-color:#fff;border-bottom:0;filter:drop-shadow(0 1px 0 #EAE4D8)}
+  #s1 .outro .ohho{font-size:clamp(32px,8.6cqh,60px);line-height:1;animation:bob 1.7s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  #s1 .outro .btn.dark{flex:none;width:100%}
+
+  /* ---- 3 기록하기 ---- */
+  #s2{background:#fff;padding:2.4cqh 4.4cqw;gap:1.4cqh}
+  #s2 h4{margin:0;font-size:clamp(14px,3cqh,21px);text-align:center;font-weight:900;flex:none}
+  #s2 .left{flex:none;gap:1.2cqh}
+  #s2 .thumbImg{width:min(22%,110px);aspect-ratio:3/4;border-radius:8px;overflow:hidden;align-self:center}
+  #s2 .thumbImg img{width:100%;height:100%;object-fit:cover;display:block}
+  #s2 .ask{font-size:clamp(12px,2.3cqh,16px);font-weight:500;line-height:1.55;color:#4A443B}
+  #s2 .right{flex:1;gap:1.2cqh}
+  #s2 .ta{flex:1;background:#F5F3EF;border:1px solid #EAE6DD;border-radius:10px;padding:1.6cqh 2cqw;color:#A9A192;font-size:clamp(12px,2.2cqh,15px);font-weight:500;position:relative;min-height:9cqh}
+  #s2 .ta em{position:absolute;right:2cqw;bottom:1.2cqh;font-style:normal;font-size:clamp(10px,1.9cqh,13px)}
+  #s2 .row{display:flex;justify-content:space-between;font-size:clamp(12px,2.2cqh,15px);font-weight:700;border-bottom:1px solid #F0EDE6;padding:1cqh 0}
+  #s2 .row .val{color:#8A7F6E;font-weight:500}
+  #s2 .btn.dark{flex:none;margin-top:.6cqh}
+
+  /* ---- 4 프로젝트 돌아보기 ---- */
+  #s3{background:#fff;padding:2.8cqh 4.4cqw}
+  #s3 .left{flex:none;gap:1.8cqh}
+  #s3 h4{margin:0;font-size:clamp(14px,3cqh,21px);font-weight:900}
+  #s3 .charRow{display:flex;align-items:flex-start;gap:2cqw}
+  #s3 .char{width:clamp(40px,8.5cqh,64px);aspect-ratio:1;border-radius:50%;background:#F3E8FA;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,4.4cqh,32px);flex:none}
+  #s3 .right{flex:1;justify-content:center;gap:1.4cqh}
+  #s3 .foot{flex:none;padding-top:1.6cqh;display:flex}
+  #s3 .foot .btn{flex:1}
+  #s3 .opt{background:#fff;border:1px solid #E9E3D6;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);padding:1.7cqh 2.4cqw;font-size:clamp(12px,2.3cqh,16px);font-weight:500;text-align:left;cursor:pointer;font-family:inherit;color:#26221C}
+  #s3 .opt:hover{border-color:var(--accent)}
+  /* 돌아보기 데이터 버튼 — 클릭 시 박스 선택 상태로 변경 */
+  #s3 .opt.on{border-color:#1A1A1A;border-width:2px;background:#FBFAF7;font-weight:700}
+
+  /* 우측 스텝 레일 */
+  .rail{
+    width:264px;flex:none;background:#F6F1E9;color:var(--ink);
+    border-left:1px solid #E0D7C7;display:flex;flex-direction:column;padding:20px 18px;
+  }
+  .rail h3{margin:0 0 14px;font-size:13px;letter-spacing:.08em;color:var(--ink-soft);font-weight:700}
+  .steps{list-style:none;margin:0;padding:0;position:relative}
+  .steps::before{content:"";position:absolute;left:11px;top:10px;bottom:10px;width:2px;background:#E0D7C7}
+  .steps button{
+    display:flex;align-items:center;gap:12px;padding:9px 0;font:inherit;font-size:14px;color:var(--ink-soft);
+    background:none;border:none;cursor:pointer;width:100%;text-align:left;position:relative;
+  }
+  .steps button:hover{color:var(--ink)}
+  .dot{width:24px;height:24px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;background:#EDE6D9;border:2px solid #DDD2BE;color:#C0B49E;z-index:1}
+  .steps li.done .dot{background:var(--ink);border-color:var(--ink);color:#fff}
+  .steps li.now button{font-weight:700;color:var(--ink)}
+  .steps li.now .dot{background:#fff;border-color:var(--accent);border-width:3px;color:transparent}
+  .railHint{margin-top:auto;font-size:12px;color:var(--ink-soft);border-top:1px solid #E0D7C7;padding-top:12px}
+
+  /* ==== 수업 정보 탭 본문 ==== */
+  /* 좌측(키워드~준비물)은 고정, 우측 본문만 스크롤 — 현행 방식 유지 */
+  .classInfo{position:absolute;inset:0;overflow:hidden;background:#FAF8F4;color:#26221C}
+  .ciDoc{display:flex;gap:30px;height:100%}
+  .ciMeta{padding:26px 0 26px 34px;overflow-y:auto}
+  .ciMain{overflow-y:auto;padding:26px 34px 60px 0}
+  /* 밝은 문서 위에 얹히므로 조작 안내도 밝은 톤으로 */
+  #hintInfo{background:rgba(255,255,255,.92);border:1px solid #E4DCCF;box-shadow:0 4px 16px rgba(38,34,28,.10)}
+  #hintInfo .hint{color:#4A443B}
+  #hintInfo .hint .ic{stroke:#8A7F6E}
+  #hintInfo .hint .key{border-color:#CFC6B4;color:#6E6659}
+  .ciMeta{width:268px;flex:none;display:flex;flex-direction:column;gap:22px}
+  .ciMain{flex:1;min-width:0;display:flex;flex-direction:column;gap:26px}
+  .ciSec h5{margin:0 0 10px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+  .ciSec h5 .ic{width:15px;height:15px;flex:none;stroke:#8A7F6E;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ciChips{display:flex;flex-wrap:wrap;gap:7px}
+  .ciChip{background:#F1EDE5;border-radius:8px;padding:5px 11px;font-size:13px;color:#4A443B}
+  .ciText{font-size:14.5px;line-height:1.7;color:#3A342C;margin:0}
+  .ciGoal{display:flex;gap:8px;font-size:14.5px;line-height:1.7;color:#3A342C}
+  .stars{display:flex;gap:3px;font-size:17px;color:#D8D2C6;line-height:1}
+  .stars i.on{color:#1A1A1A}
+  .ciMat{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ECE7DD;border-radius:12px;padding:10px 14px;font-size:13.5px}
+  .ciMat img{width:56px;height:38px;object-fit:cover;border-radius:6px;flex:none}
+  .ciTbl{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border:1px solid #ECE7DD;border-radius:12px;overflow:hidden}
+  .ciTbl th{background:#F5F2EC;font-weight:700;padding:12px 14px;text-align:left;color:#4A443B;white-space:nowrap}
+  .ciTbl td{padding:12px 14px;border-top:1px solid #F0EDE6;line-height:1.6;color:#3A342C;vertical-align:top}
+  .ciTbl td:first-child,.ciTbl td:nth-child(2){white-space:nowrap;color:#6E6659}
+  .ciFiles{display:flex;gap:12px;flex-wrap:wrap}
+  .ciFile{width:150px}
+  .ciFile .pv{height:104px;background:#fff;border:1px solid #ECE7DD;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .ciFile .pv img{width:100%;height:100%;object-fit:cover;display:block}
+  .ciFile .pv span{font-size:11.5px;font-weight:700;color:#8A7F6E;letter-spacing:.04em}
+  .ciFile b{display:block;font-size:12.5px;font-weight:500;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ciLinks{display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.6}
+  .ciLinks a{color:#1B6BD6}
+  /* 추천 챌린지 — 정방형 카드, 가로 스크롤 없이 줄바꿈 */
+  .ciRec{display:flex;flex-wrap:wrap;gap:18px 14px}
+  .ciRecCard{width:166px;flex:none;cursor:pointer}
+  .ciRecCard:hover .art{outline:2.5px solid var(--accent);outline-offset:2px}
+  .ciRecCard .art{aspect-ratio:1;border-radius:12px;overflow:hidden;background:#EDE8DF}
+  .ciRecCard .art img{width:100%;height:100%;object-fit:cover;display:block}
+  .ciRecCard small{display:block;font-size:11.5px;color:#8A7F6E;margin-top:8px}
+  .ciRecCard b{display:block;font-size:13.5px;font-weight:700;line-height:1.4}
+  @media (max-width:900px){
+    .viewerArea{padding:16px 56px}
+  }
+  @media (max-width:760px){
+    .tabs{display:none}
+  }
+
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
+    background:var(--ink);color:#fff;font-size:13px;padding:9px 16px;border-radius:999px;z-index:99;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+  }
+  footer{margin-top:56px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:16px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">클래스 웹 · 개선 제안</div>
+  <h1>아하오호 화면 보기, 팝업에서 전체 화면으로</h1>
+  <p class="lede">현재는 모달 안에 세로로 긴 카드를 끼워 넣어 뷰어가 작고, 기본 배율(1280×800)에서 UI가 잘림.
+  썸네일 클릭 시 같은 탭에서 전체 화면으로 전환하고, <b>앱 화면 구성(세로 카드)은 그대로 유지한 채
+  화면 높이를 전부 카드에 주는 안</b>. 휠·트랙패드 핀치로 원하는 부분을 확대해 세부도 크게 볼 수 있음.</p>
+  <div class="chips">
+    <span class="chip">새 창·새 탭 없이 전체 화면 진입</span>
+    <span class="chip">100% 배율에서 잘림 없음</span>
+    <span class="chip">앱 화면 구성 유지</span>
+    <span class="chip">휠·핀치 확대 + 드래그</span>
+  </div>
+
+  <h2>데모</h2>
+  <p class="sub">챌린지 썸네일을 클릭하면 전체 화면 보기로 진입함. 우측 <b>진행 단계</b>로 4개 단계(개요·가이드 자세히 보기·기록하기·프로젝트 돌아보기)를 바로 이동할 수 있고, <b>스테이지 좌우 화살표</b>는 단계 안의 페이지까지 순서대로 지나감(개요의 아하's Pick 3장 → 가이드 페이지 → 기록하기 → 돌아보기).
+  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요의 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
+  <div class="thumbs">
+    <button class="thumb" onclick="openViewer(this)">
+      <div class="art"><img src="{{THUMB1}}" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
+      <div class="meta"><b>두근두근 비밀 상자</b><span>🛠️ 만들기</span></div>
+    </button>
+    <button class="thumb" onclick="openViewer(this)">
+      <div class="art"><img src="{{THUMB2}}" alt="도둑을 잡아라! 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
+      <div class="meta"><b>도둑을 잡아라!</b><span>🛠️ 만들기</span></div>
+    </button>
+  </div>
+
+  <h2>레이아웃 규칙</h2>
+  <div class="rules">
+    <div class="rule"><b>1 · 전체 화면 레이어 진입</b><p>썸네일 클릭 → 같은 탭에서 <code>fixed inset:0</code> 레이어(또는 라우트)로 전환. 상단은 56px 한 줄 바에 닫기·제목·탭 통합.</p></div>
+    <div class="rule"><b>2 · 앱 구성 유지 + 높이 우선 contain-fit</b><p>세로 카드의 구성·비율은 그대로 두고, 카드 높이 = <code>100dvh − 56px − 여백</code>으로 화면을 꽉 채움. 높이·폭 어느 쪽이 모자라도 잘리지 않고 통째로 축소 → 어떤 해상도·배율에서도 잘림 0. 기준 해상도 <code>1280×800</code>.</p></div>
+    <div class="rule"><b>3 · 확대 — 휠·핀치 + 드래그</b><p>휠 또는 트랙패드 핀치로 커서 위치 기준 1~3배 확대. 확대 시 카드가 프레임을 벗어나 무대(뷰어 영역) 전체를 사용하고, 드래그로 이동, 더블클릭·화면 전환 시 원래 크기로 복귀. 카드 밖의 조작 요소(화면 넘기기 화살표·스텝 이동·조작 안내)는 함께 커지지 않음.</p></div>
+    <div class="rule"><b>4 · 조작 요소는 카드 밖에</b><p>가이드 스텝 이동과 아하's Pick 슬라이드 이동(<code>◀ ▶</code>)은 앱 화면 카드 안이 아니라 <b>카드 바깥 하단</b>에 배치 — 앱 화면 구성을 그대로 유지하고, 확대해도 함께 커지지 않음. 조작 안내는 좌하단에 아이콘 + 항목별 한 줄로 상시 노출.</p></div>
+    <div class="rule"><b>6 · 아하's Pick</b><p>개요 화면은 <b>챌린지 썸네일 1장 + 아하's Pick 3장</b>이 같은 영역을 슬라이드로 공유(Pick 1개 이상 지정된 챌린지에만 화살표 노출). 첫 슬라이드는 우측만, 마지막은 좌측만 노출하고, <b>아하의 설명글도 슬라이드에 맞춰 자동 전환</b>. Pick 이미지 위에는 작성자 프로필·닉네임을 표기하고, 이동 화살표·인디케이터도 앱과 동일하게 <b>이미지 안</b>에 배치(앱 UI이므로 카드와 함께 확대됨).</p></div>
+    <div class="rule"><b>4 · 이미지 비율 대응</b><p>가이드 스텝 이미지는 가로가 긴 것(1003×803)·세로가 긴 것(800×1000)이 혼재 → 이미지 박스 안에서 원본 비율 그대로 <code>contain</code>으로 수용(박스 크기는 고정, 이미지만 맞춤).</p></div>
+    <div class="rule"><b>5 · 진행 단계는 우측 레일</b><p>진행 단계는 264px 우측 레일 고정. 단계 클릭으로 해당 화면 바로 이동. <b>수업 정보 탭에서는 레일 없이</b> 문서가 화면 폭을 전부 사용.</p></div>
+    <div class="rule"><b>7 · 수업 정보 탭</b><p>현행 2단 구성(좌측 키워드·역량·카테고리·난이도·준비물 / 우측 설명·목표·성취기준·추천·참고자료)을 유지하고 폭만 전체 화면으로 넓힘. 글 중심이라 <b>휠은 위아래 이동, 트랙패드 핀치는 글자 확대</b>로 분리하고, 확대는 <code>transform</code> 대신 <code>zoom</code>을 써서 줄바꿈이 다시 흐르도록 함.</p></div>
+  </div>
+
+  <footer>레이아웃 검증용 목업 — 실제 서비스 이미지 리소스 사용(썸네일·가이드 이미지), 문구는 예시 · 기준 기기: LG 그램 14 (1920×1200 @150% = 1280×800) · 원본 캡쳐: <code>화면보기_전체화면_개선/현재 팝업 상태(윈도우 화면 90%로 캡쳐)/</code></footer>
+</div>
+
+<!-- ===== 전체 화면 오버레이 ===== -->
+<div class="overlay" id="ov" hidden role="dialog" aria-modal="true" aria-label="아하오호 화면 보기">
+  <div class="topbar">
+    <button class="tb-btn" id="backBtn" onclick="popChallenge()" hidden></button>
+    <span class="title" id="ovTitle">챌린지</span>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tabView" role="tab" aria-selected="true"  onclick="setTab('view')">아하오호 화면 보기</button>
+      <button class="tab" id="tabInfo" role="tab" aria-selected="false" onclick="setTab('info')">수업 정보</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="tb-btn" onclick="closeViewer()" aria-label="닫기">✕</button>
+  </div>
+  <div class="body">
+    <div class="viewerArea">
+      <button class="navArrow prev" id="prevBtn" onclick="go(-1)" aria-label="이전 화면">◀</button>
+      <div class="stageBox" id="stageBox">
+      <div class="device" aria-label="앱 뷰어">
+
+        <!-- 1 개요 -->
+        <section class="screen active" id="s0">
+          <div class="split">
+            <div class="pane media">
+              <div class="slides" id="s0Slides">
+                <div class="slide on"><img id="s0Thumb" src="{{THUMB1}}" alt="챌린지 대표 이미지"></div>
+                <div class="slide">
+                  <img src="{{PICK1}}" alt="아하's Pick 1">
+                  <span class="pickTag"><img src="{{AV1}}" alt=""><b>초록도마뱀</b></span>
+                </div>
+                <div class="slide">
+                  <img src="{{PICK2}}" alt="아하's Pick 2">
+                  <span class="pickTag"><img src="{{AV2}}" alt=""><b>말랑이</b></span>
+                </div>
+                <div class="slide">
+                  <img src="{{PICK3}}" alt="아하's Pick 3">
+                  <span class="pickTag"><img src="{{AV3}}" alt=""><b>뭉치대장</b></span>
+                </div>
+                <button class="pickArrow prev" id="pickPrev" onclick="pick(-1)" aria-label="이전 슬라이드">◀</button>
+                <button class="pickArrow next" id="pickNext" onclick="pick(1)" aria-label="다음 슬라이드">▶</button>
+                <span class="pickDots" id="pickDots"></span>
+              </div>
+              <span class="byChip">by. 이룹빠!</span>
+            </div>
+            <div class="pane info">
+              <div class="charRow">
+                <div class="bubble" id="s0Bubble">오늘은 뭘 만들어 볼까? 두구두구~!</div>
+                <div class="char">🐦</div>
+              </div>
+              <h4 id="s0Title">챌린지</h4>
+              <div class="cat" id="s0Cat">🛠️ 만들기</div>
+              <div class="actions">
+                <button class="btn ghost" onclick="appOnly()">✂️ 활동재료</button>
+                <button class="btn dark" onclick="show(1)">시작하기</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 가이드 자세히 보기 -->
+        <section class="screen" id="s1">
+          <div class="prog"><span class="step" id="gStep">1번째</span><div class="bar"><i id="gBar"></i></div></div>
+          <div class="split">
+            <div class="pane imgBox" id="gImgPane">
+              <img id="gImgW" src="{{GUIDE_W}}" alt="가이드 이미지(가로가 긴 형태)">
+              <img id="gImgT" src="{{GUIDE_T}}" alt="가이드 이미지(세로가 긴 형태)" hidden>
+            </div>
+            <div class="pane side" id="gSidePane">
+              <div class="caption" id="gCap"></div>
+            </div>
+            <!-- 마지막 페이지: 이미지 없이 업로드 안내 문구 + 오호 캐릭터 + 기록하기 -->
+            <div class="pane outro" id="gOutro" hidden>
+              <div class="outroBody">
+                <div class="bubble" id="gOutroText"></div>
+                <div class="ohho" aria-hidden="true">🐙</div>
+              </div>
+              <button class="btn dark" onclick="show(2)">기록하기</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3 기록하기 -->
+        <section class="screen" id="s2">
+          <h4>기록하기</h4>
+          <div class="split">
+            <div class="pane left">
+              <div class="thumbImg"><img id="recThumb" src="{{THUMB1}}" alt="프로젝트 썸네일"></div>
+              <div class="ask">만들면서 제일 재미있었던 순간은 언제였어? 어떤 점이 어려웠는지도 소개해 줘~😉</div>
+            </div>
+            <div class="pane right">
+              <div class="ta">프로젝트에 대해 설명해주세요.<em>0/500</em></div>
+              <div class="row" onclick="appOnly()"><span>챌린지</span><span class="val" id="recChal">챌린지 ›</span></div>
+              <div class="row" onclick="appOnly()"><span>이 프로젝트를 볼 수 있는 사람</span><span class="val">모든 사람 ›</span></div>
+              <button class="btn dark" onclick="show(3)">기록하기</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4 프로젝트 돌아보기 -->
+        <section class="screen" id="s3">
+          <div class="split">
+            <div class="pane left">
+              <h4>프로젝트 돌아보기</h4>
+              <div class="charRow">
+                <div class="char">😎</div>
+                <div class="bubble">이번 프로젝트를 진행하며 느낀 점 하나를 고른다면?</div>
+              </div>
+            </div>
+            <div class="pane right">
+              <button class="opt" onclick="pickOpt(this)">😲 이런 것도 만들 수 있었어? 나 좀 놀랐어!</button>
+              <button class="opt" onclick="pickOpt(this)">😅 생각처럼 잘 안돼서 조금 아쉬웠어~</button>
+              <button class="opt" onclick="pickOpt(this)">😄 친구랑 같이했더니 엄청 재미있었다!</button>
+              <button class="opt" onclick="pickOpt(this)">✌️ 나 좀 만들기에 소질 있는 듯? 자유롭고 후련했어!</button>
+            </div>
+          </div>
+          <div class="foot"><button class="btn dark" onclick="show(0)">완료</button></div>
+        </section>
+
+      </div>
+        <!-- 가이드 스텝 이동 — 카드 바깥 -->
+        <div class="guideCtrl" id="guideCtrl" hidden>
+          <button class="gBtn" id="gPrev" onclick="guide(-1)" aria-label="이전 스텝">◀</button>
+          <span class="gLabel" id="gLabel"></span>
+          <button class="gBtn" id="gNext" onclick="guide(1)" aria-label="다음 스텝">▶</button>
+        </div>
+      </div>
+      <button class="navArrow next" id="nextBtn" onclick="go(1)" aria-label="다음 화면">▶</button>
+      <!-- ===== 수업 정보 탭 ===== -->
+      <div class="classInfo" id="classInfo" hidden>
+          <div class="ciDoc">
+            <aside class="ciMeta">
+              <section class="ciSec" id="ci-keyword">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M3 7h14M3 13h14M8 3 6 17M14 3l-2 14"/></svg>활동 키워드</h5>
+                <div class="ciChips"><span class="ciChip">야외활동</span><span class="ciChip">상상하기</span><span class="ciChip">일상 재구성</span></div>
+              </section>
+              <section class="ciSec" id="ci-comp">
+                <h5><svg class="ic" viewBox="0 0 20 20"><circle cx="6" cy="15" r="2.4"/><circle cx="15" cy="12.5" r="2.4"/><path d="M8.4 15V5l9 1.6v6"/></svg>성취 역량</h5>
+                <div class="ciChips"><span class="ciChip">기획/융합사고 (creativity)</span></div>
+              </section>
+              <section class="ciSec" id="ci-cat">
+                <h5><svg class="ic" viewBox="0 0 20 20"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>카테고리</h5>
+                <div class="ciChips"><span class="ciChip">그림과 만들기</span></div>
+              </section>
+              <section class="ciSec" id="ci-level">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M4 16V9M9 16V5M14 16v-4"/></svg>난이도</h5>
+                <div class="stars"><i class="on">★</i><i class="on">★</i><i class="on">★</i><i>★</i><i>★</i></div>
+              </section>
+              <section class="ciSec" id="ci-mat">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M3 7h14v9H3zM6.5 7V4.5h7V7"/></svg>준비물</h5>
+                <div class="ciMat"><img src="{{THUMB2}}" alt="">모바일 기기</div>
+              </section>
+            </aside>
+            <main class="ciMain">
+              <section class="ciSec" id="ci-desc">
+                <h5><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 13V9.5M10 6.8v.4"/></svg>챌린지 설명</h5>
+                <p class="ciText">주변의 건물을 사진으로 찍고 내 스타일로 건물의 벽화를 꾸며봅니다.</p>
+              </section>
+              <section class="ciSec" id="ci-goal">
+                <h5><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.4"/></svg>활동 목표</h5>
+                <div class="ciGoal"><span>✓</span><span>주변 건물을 관찰하고, 상상력을 발휘해 나만의 벽화를 디자인하며 창의적 표현력을 기른다.</span></div>
+              </section>
+              <section class="ciSec" id="ci-std">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M3 4.5h6.5a2 2 0 0 1 2 2V17M17 4.5h-5.5"/><path d="M3 4.5V17h14V4.5"/></svg>교과 성취 기준</h5>
+                <table class="ciTbl">
+                  <thead><tr><th>과목명</th><th>성취기준 코드</th><th>성취기준 세부 내용</th></tr></thead>
+                  <tbody>
+                    <tr><td>미술</td><td>4미01-04</td><td>생활 속에서 활용되는 미술에 관심을 가지고 미술의 특징과 역할을 발견할 수 있다.</td></tr>
+                    <tr><td>미술</td><td>6미01-02</td><td>자신이나 주변 환경에서 찾은 감각적 특징, 느낌, 생각 등을 관련지어 나타낼 수 있다.</td></tr>
+                    <tr><td>수학</td><td>4수03-12</td><td>주어진 도형을 이용하여 여러 가지 모양을 만들거나 채우고 설명할 수 있다.</td></tr>
+                    <tr><td>실과<br>기술가정<br>정보</td><td>6실04-02</td><td>생활 속 디지털 기술의 중요성을 이해하고, 디지털 기기와 디지털 콘텐츠 저작 도구를 사용하여 발표 자료를 만들어 보면서 디지털 기기의 활용 능력을 기른다.</td></tr>
+                  </tbody>
+                </table>
+              </section>
+              <section class="ciSec" id="ci-ref">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M11.5 4.5 15.5 8.5 8 16H4v-4z"/><path d="M10 6 14 10"/></svg>교육자 참고 자료</h5>
+                <div class="ciFiles">
+                  <div class="ciFile"><div class="pv"><span>PDF</span></div><b>잠만경 도안(4*4).pdf</b></div>
+                  <div class="ciFile"><div class="pv"><img src="{{GUIDE_W}}" alt=""></div><b>몸 도안(샘플).jpg</b></div>
+                  <div class="ciFile"><div class="pv"><img src="{{GUIDE_T}}" alt=""></div><b>그리는 방법.jpeg</b></div>
+                </div>
+                <div class="ciLinks" style="margin-top:12px">
+                  <span>국립생물자원관 - <a href="#" onclick="return false">https://blog.naver.com/nibr_bio/222937240690</a></span>
+                  <span>99%가 모르는 버섯의 비밀 - <a href="#" onclick="return false">https://www.youtube.com/watch?v=GhSboCidwPI</a></span>
+                </div>
+              </section>
+              <section class="ciSec" id="ci-etc">
+                <h5><svg class="ic" viewBox="0 0 20 20"><path d="M4 4.5h12v11H4z"/><path d="M7 8h6M7 11h4"/></svg>기타 참고 사항</h5>
+                <p class="ciText">- 아이들이 서로의 작품을 감상하고 느껴지는 것을 적어 공유할 수 있는 시간을 제공해주세요.</p>
+              </section>
+              <section class="ciSec" id="ci-rec">
+                <h5><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M7 12.2c.8.9 1.8 1.3 3 1.3s2.2-.4 3-1.3M7.5 8h.4M12.1 8h.4"/></svg>추천 챌린지</h5>
+                <div class="ciRec">
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>그림과 만들기</small><b>쭉! 잡아당겨 그리기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>소리와 음악</small><b>수다스러운 말렛 만들기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>놀이와 게임</small><b>연필 뽑기 게임</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>과학과 자연</small><b>물방울 돋보기 만들기</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>몸과 감각</small><b>블라인드 컨투어 드로잉</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>수와 생각</small><b>도전! 패턴 콜렉터</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB1}}" alt=""></div><small>그림과 만들기</small><b>콜라주 팝업카드</b></div>
+                  <div class="ciRecCard" onclick="openChallenge(this)"><div class="art"><img src="{{THUMB2}}" alt=""></div><small>몸과 감각</small><b>거울 반전 그리기</b></div>
+                </div>
+              </section>
+            </main>
+          </div>
+      </div>
+
+      <!-- 조작 안내 — 탭별 -->
+      <div class="hintBar" id="hintView">
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17 17M6.5 8.5h4M8.5 6.5v4"/></svg>
+          휠·핀치로 확대
+        </span>
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><path d="M10 3v14M3 10h14M10 3 7.5 5.5M10 3l2.5 2.5M10 17l-2.5-2.5M10 17l2.5-2.5M3 10l2.5-2.5M3 10l2.5 2.5M17 10l-2.5-2.5M17 10l-2.5 2.5"/></svg>
+          드래그로 이동
+        </span>
+        <span class="hint">
+          <svg class="ic" viewBox="0 0 20 20"><path d="M5 3.5 8 16l2.2-4.4L15 10.5z"/><path d="M13.5 3.5v2M16.5 6.5h-2"/></svg>
+          더블클릭하면 원래 크기
+        </span>
+        <span class="hint"><span class="key">←</span><span class="key">→</span>화면 넘기기</span>
+        <span class="hint"><span class="key">ESC</span>닫기</span>
+      </div>
+      <div class="hintBar" id="hintInfo" hidden>
+        <span class="hint"><span class="key">ESC</span>닫기</span>
+      </div>
+    </div>
+    <aside class="rail" id="rail">
+      <h3>진행 단계</h3>
+      <ul class="steps" id="stepList">
+        <li><button onclick="show(0)"><span class="dot">✓</span>개요</button></li>
+        <li><button onclick="show(1)"><span class="dot">✓</span>가이드 자세히 보기</button></li>
+        <li><button onclick="show(2)"><span class="dot">✓</span>기록하기</button></li>
+        <li><button onclick="show(3)"><span class="dot">✓</span>프로젝트 돌아보기</button></li>
+      </ul>
+      <p class="railHint">단계를 클릭하면 해당 화면으로 이동함.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+  const ov = document.getElementById('ov');
+  const N = 4;
+  let cur = 0;
+
+  function applyChallenge(title, cat, thumb){
+    document.getElementById('ovTitle').textContent = title;
+    document.getElementById('s0Title').textContent = title;
+    document.getElementById('s0Cat').textContent = cat;
+    document.getElementById('recChal').textContent = title + ' ›';
+    document.getElementById('s0Thumb').src = thumb;
+    document.getElementById('recThumb').src = thumb;
+  }
+  function openViewer(btn){
+    if (btn) applyChallenge(btn.querySelector('.meta b').textContent,
+                            btn.querySelector('.meta span').textContent,
+                            btn.querySelector('img').src);
+    ov.hidden = false; stack.length = 0; cur = 0; pCur = 0; gCur = 0;
+    document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
+    renderDepth(); setTab('view'); document.body.style.overflow='hidden';
+  }
+  function closeViewer(){ ov.hidden = true; stack.length = 0; renderDepth(); document.body.style.overflow=''; resetZoom(); }
+
+  /* ===== 챌린지 상세 모달 스택 =====
+     수업 정보의 추천 챌린지를 누르면 그 챌린지의 전체 화면 모달이 위에 겹쳐 열리고,
+     상단 바의 뒤로(‹ 이전 챌린지명) 또는 ESC로 원래 모달로 돌아옴. ✕는 전체 닫기. */
+  const stack = [];
+  function currentState(){
+    return {title:document.getElementById('ovTitle').textContent,
+            cat:document.getElementById('s0Cat').textContent,
+            thumb:document.getElementById('s0Thumb').src,
+            tab:curTab, cur, pCur, gCur};
+  }
+  function renderDepth(){
+    ov.classList.toggle('stacked', stack.length > 0);
+    const b = document.getElementById('backBtn');
+    b.hidden = stack.length === 0;
+    if (stack.length) b.textContent = '‹ ' + stack[stack.length-1].title;
+  }
+  function openChallenge(card){
+    stack.push(currentState());
+    applyChallenge(card.querySelector('b').textContent,
+                   card.querySelector('small').textContent,
+                   card.querySelector('img').src);
+    cur = 0; pCur = 0; gCur = 0;
+    document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
+    renderDepth(); setTab('view');
+  }
+  function popChallenge(){
+    if (!stack.length) return;
+    const s = stack.pop();
+    applyChallenge(s.title, s.cat, s.thumb);
+    cur = s.cur; pCur = s.pCur; gCur = s.gCur;
+    renderDepth(); setTab(s.tab);
+  }
+  function show(i){
+    const prev = cur;
+    cur = Math.max(0, Math.min(N-1, i));
+    /* 개요로 (재)진입하면 슬라이드는 챌린지 썸네일부터 다시 */
+    if (cur === 0 && prev !== 0) pCur = 0;
+    resetZoom();
+    document.querySelectorAll('.screen').forEach((s,idx)=>s.classList.toggle('active', idx===cur));
+    document.querySelectorAll('#stepList li').forEach((li,idx)=>{
+      li.classList.toggle('now', idx===cur);
+      li.classList.toggle('done', idx<cur);
+    });
+    /* 가이드 자세히 보기(1)에서만 스텝 이동 컨트롤을 카드 밖에 노출
+       개요의 아하's Pick 이동은 앱 화면과 동일하게 카드(이미지) 안에 있음 */
+    const isOv = cur === 0, isGuide = cur === 1;
+    document.getElementById('guideCtrl').hidden = !isGuide;
+    document.getElementById('stageBox').classList.toggle('hasCtrl', isGuide);
+    if (isOv) renderPick();
+    if (isGuide) renderGuide();
+    updateNav();
+  }
+
+  /* ===== 좌우 화살표·키보드 ←→ =====
+     단계만 건너뛰지 않고 단계 안의 페이지까지 순서대로 이동
+     개요(썸네일 + 아하's Pick 3) → 가이드 1~n → 기록하기 → 프로젝트 돌아보기 */
+  function flatSeq(){
+    const seq = [];
+    pickSlides.forEach((_,i)=>seq.push({s:0, p:i}));
+    gSteps.forEach((_,i)=>seq.push({s:1, g:i}));
+    seq.push({s:2}, {s:3});
+    return seq;
+  }
+  function flatIndex(){
+    return flatSeq().findIndex(x =>
+      x.s === cur && (cur === 0 ? x.p === pCur : cur === 1 ? x.g === gCur : true));
+  }
+  function updateNav(){
+    const seq = flatSeq(), i = flatIndex();
+    document.getElementById('prevBtn').disabled = i <= 0;
+    document.getElementById('nextBtn').disabled = i >= seq.length - 1;
+  }
+  function go(d){
+    const seq = flatSeq();
+    const t = seq[Math.max(0, Math.min(seq.length-1, flatIndex() + d))];
+    if (t.s !== cur) show(t.s);            // show()가 pCur/gCur을 초기화하므로
+    if (t.s === 0){ pCur = t.p; renderPick(); }   // 목표 페이지는 그 뒤에 지정
+    if (t.s === 1){ gCur = t.g; renderGuide(); }
+  }
+
+  /* ===== 개요: 챌린지 썸네일 + 아하's Pick 슬라이드 =====
+     아하's Pick이 1개 이상 지정된 챌린지에만 이동 화살표가 노출됨.
+     첫 슬라이드(썸네일)는 우측 화살표만, 마지막 슬라이드는 좌측 화살표만 노출. */
+  const pickSlides = [
+    {bubble:'오늘은 뭘 만들어 볼까? 두구두구~!', label:'챌린지 썸네일'},
+    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 1 · 초록도마뱀"},
+    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 2 · 말랑이"},
+    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 3 · 뭉치대장"},
+  ];
+  let pCur = 0;
+  function renderPick(){
+    const p = pickSlides[pCur], last = pickSlides.length - 1;
+    document.querySelectorAll('#s0Slides .slide').forEach((s,i)=>s.classList.toggle('on', i===pCur));
+    /* 아하 설명글도 슬라이드에 맞춰 자동 전환 */
+    document.getElementById('s0Bubble').textContent = p.bubble;
+    /* 기획자 표기(by.)는 챌린지 썸네일에만 — Pick은 이미지 위 프로필·닉네임으로 대체 */
+    document.querySelector('#s0 .byChip').hidden = pCur !== 0;
+    document.getElementById('pickPrev').toggleAttribute('data-off', pCur === 0);
+    document.getElementById('pickNext').toggleAttribute('data-off', pCur === last);
+    const dots = document.getElementById('pickDots');
+    dots.innerHTML = pickSlides.map((_,i)=>`<i class="${i===pCur?'on':''}" onclick="pickGo(${i})"></i>`).join('');
+    updateNav();
+  }
+  function pick(d){ pickGo(Math.max(0, Math.min(pickSlides.length-1, pCur + d))); }
+  function pickGo(i){ pCur = i; renderPick(); }
+
+  /* 가이드 스텝: 가로 긴 이미지(1003×803) / 세로 긴 이미지(800×1000) 실제 리소스 */
+  const gSteps = [
+    {img:'gImgW', cap:'따라 만들고 싶은 캐릭터를 하나 골라보세요.', label:'가로가 긴 이미지 (1003×803)'},
+    {img:'gImgT', cap:'블록을 순서대로 연결해서 나만의 소리를 만들어보세요. 높낮이를 바꾸면 느낌이 완전히 달라지니까 여러 번 바꿔가며 소리를 들어보면 좋아요!', label:'세로가 긴 이미지 (800×1000)'},
+    /* 마지막 페이지 — 이미지 없이 업로드 안내 문구(API 호출) + 오호 캐릭터 + 기록하기 버튼 */
+    {outro:'색이 바뀌는 것처럼 보인 이유를 알아챘어?\n색이 바뀌는 마술을 더 잘 보여주기 위해 손놀림이나 각도를 어떻게 조절했는지도 알려줘.', label:'마무리 · 업로드 안내 + 기록하기'},
+  ];
+  let gCur = 0;
+  function renderGuide(){
+    const g = gSteps[gCur], last = gSteps.length - 1;
+    const isOutro = !!g.outro;
+    document.getElementById('gImgPane').hidden  = isOutro;
+    document.getElementById('gSidePane').hidden = isOutro;
+    document.getElementById('gOutro').hidden    = !isOutro;
+    if (isOutro){
+      document.getElementById('gOutroText').textContent = g.outro;
+    } else {
+      document.getElementById('gImgW').hidden = g.img !== 'gImgW';
+      document.getElementById('gImgT').hidden = g.img !== 'gImgT';
+      document.getElementById('gCap').textContent = g.cap;
+    }
+    /* 페이지네이션 — 현재/전체 */
+    document.getElementById('gStep').textContent = `${gCur+1}/${gSteps.length}`;
+    document.getElementById('gBar').style.width = ((gCur+1) / gSteps.length * 100) + '%';
+    document.getElementById('gLabel').textContent = `${gCur+1} / ${gSteps.length} · ${g.label}`;
+    document.getElementById('gPrev').toggleAttribute('data-off', gCur === 0);
+    document.getElementById('gNext').toggleAttribute('data-off', gCur === last);
+    updateNav();
+  }
+  function guide(d){
+    gCur = Math.max(0, Math.min(gSteps.length - 1, gCur + d));
+    renderGuide();
+  }
+
+  /* ===== 탭 전환: 아하오호 화면 보기 / 수업 정보 ===== */
+  let curTab = 'view';
+  function setTab(t){
+    curTab = t;
+    resetZoom();
+    const isView = t === 'view';
+    document.getElementById('tabView').setAttribute('aria-selected', isView);
+    document.getElementById('tabInfo').setAttribute('aria-selected', !isView);
+    document.getElementById('stageBox').hidden = !isView;
+    document.getElementById('classInfo').hidden = isView;
+    document.getElementById('prevBtn').hidden = !isView;
+    document.getElementById('nextBtn').hidden = !isView;
+    document.getElementById('rail').hidden = !isView;
+    document.getElementById('hintView').hidden = !isView;
+    document.getElementById('hintInfo').hidden = isView;
+    if (isView) show(cur); else ci.scrollTop = 0;
+  }
+
+  /* ===== 수업 정보 ===== */
+  const ci = document.getElementById('classInfo');
+
+  /* ===== 확대: 휠·트랙패드 핀치 + 드래그 이동 ===== */
+  const dev = document.querySelector('.device');
+  const va = document.querySelector('.viewerArea');
+  let zs = 1, ztx = 0, zty = 0;
+  function applyZoom(){
+    dev.style.transform = zs === 1 ? '' : `translate(${ztx}px, ${zty}px) scale(${zs})`;
+    dev.classList.toggle('grab', zs > 1);
+  }
+  function resetZoom(){ zs = 1; ztx = 0; zty = 0; applyZoom(); }
+  function clampPan(){
+    // 카드가 무대 밖으로 완전히 사라지지 않도록 (최소 80px는 남김)
+    const W = dev.offsetWidth, H = dev.offsetHeight;
+    const bx = dev.offsetLeft, by = dev.offsetTop;
+    ztx = Math.max(-(bx + W * zs - 80), Math.min(va.clientWidth  - bx - 80, ztx));
+    zty = Math.max(-(by + H * zs - 80), Math.min(va.clientHeight - by - 80, zty));
+  }
+  va.addEventListener('wheel', e=>{
+    /* 수업 정보 탭은 확대 없음 — 휠·핀치 모두 브라우저 기본 동작(스크롤)에 맡김 */
+    if (curTab === 'info') return;
+    e.preventDefault();
+    const r = dev.getBoundingClientRect();
+    const bx = r.left - ztx, by = r.top - zty;           // 변환 전 카드 좌상단(뷰포트 기준)
+    const px = (e.clientX - bx - ztx) / zs;              // 커서 아래 콘텐츠 좌표
+    const py = (e.clientY - by - zty) / zs;
+    // 트랙패드 핀치는 ctrlKey+deltaY로 들어옴 → 연속 배율, 휠은 단계 배율
+    const factor = e.ctrlKey ? Math.exp(-e.deltaY / 100) : (e.deltaY < 0 ? 1.15 : 1/1.15);
+    const ns = Math.min(3, Math.max(1, zs * factor));
+    ztx = (e.clientX - bx) - ns * px;                    // 커서 아래 지점 고정
+    zty = (e.clientY - by) - ns * py;
+    zs = ns;
+    if (zs === 1){ ztx = 0; zty = 0; } else clampPan();
+    applyZoom();
+  }, {passive:false});
+  let drag = null;
+  dev.addEventListener('mousedown', e=>{
+    if (zs === 1) return;
+    if (e.target.closest('button')) return;   // 앱 화면 버튼 조작 방해 금지
+    drag = {x:e.clientX, y:e.clientY, tx:ztx, ty:zty};
+    dev.classList.add('grabbing');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{
+    if (!drag) return;
+    ztx = drag.tx + (e.clientX - drag.x);
+    zty = drag.ty + (e.clientY - drag.y);
+    clampPan(); applyZoom();
+  });
+  window.addEventListener('mouseup', ()=>{ drag = null; dev.classList.remove('grabbing'); });
+  dev.addEventListener('dblclick', resetZoom);
+
+  document.addEventListener('keydown', e=>{
+    if (ov.hidden) return;
+    /* 겹쳐 열린 모달이 있으면 ESC는 그 모달만 닫고 이전 모달로 복귀 */
+    if (e.key==='Escape'){ if (stack.length) popChallenge(); else closeViewer(); return; }
+    if (curTab !== 'view') return;      // 수업 정보 탭에서는 화면 넘기기 없음
+    if (e.key==='ArrowLeft') go(-1);
+    if (e.key==='ArrowRight') go(1);
+  });
+  /* 앱 전용 기능 — 단계 진행과 무관한 조작(활동재료, 챌린지 선택, 공개 범위 등) */
+  function appOnly(){ toast('아하오호 앱에서만 사용할 수 있는 기능입니다.'); }
+
+  /* 돌아보기 데이터 버튼 — 클릭 시 박스 선택 상태로 변경(단일 선택) */
+  function pickOpt(el){
+    const on = el.classList.contains('on');
+    document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
+    if (!on) el.classList.add('on');
+  }
+
+  let toastTimer;
+  function toast(msg){
+    let t=document.querySelector('.toast');
+    if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
+    t.textContent=msg; clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.remove(), 2600);
+  }
+</script>
