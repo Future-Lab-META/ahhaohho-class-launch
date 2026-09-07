@@ -61,11 +61,6 @@
   /* ==== 전체 화면 오버레이 ==== */
   .overlay{position:fixed;inset:0;background:var(--stage);z-index:50;display:flex;flex-direction:column}
   .overlay[hidden]{display:none!important}
-  /* 추천 챌린지에서 열린 모달 — 이전 모달 위에 겹쳐 놓인 것으로 보이도록 한 단 들여쓰기 */
-  .overlay.stacked{
-    inset:18px;border-radius:18px;overflow:hidden;
-    box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 100vmax rgba(0,0,0,.5);
-  }
   .topbar{
     height:56px;flex:none;display:flex;align-items:center;gap:12px;padding:0 12px 0 8px;
     background:#221E19;color:var(--stage-ink);border-bottom:1px solid #3A342C;
@@ -185,7 +180,11 @@
   #s0 .media .byChip{position:absolute;left:4.5cqw;bottom:3.4cqh;background:rgba(26,26,26,.72);color:#fff;font-size:clamp(10px,1.9cqh,14px);font-weight:500;border-radius:8px;padding:.6cqh 1.6cqw;z-index:1}
   #s0 .info{flex:1;padding:2.4cqh 4.4cqw 2.8cqh;gap:1.4cqh}
   #s0 .charRow{display:flex;align-items:flex-end;justify-content:flex-end;gap:1.6cqw;margin-top:-4.6cqh;z-index:1}
-  #s0 .char{width:clamp(36px,8cqh,60px);aspect-ratio:1;border-radius:50%;background:#EAF3FA;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,4cqh,30px);flex:none;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  #s0 .char{width:clamp(36px,8cqh,60px);aspect-ratio:1;border-radius:50%;background:#EAF3FA;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,4cqh,30px);flex:none;box-shadow:0 2px 8px rgba(0,0,0,.08);border:none;padding:0;font-family:inherit;cursor:pointer}
+  /* 아하's Pick 슬라이드에서는 아하를 눌러도 반응하지 않음 */
+  #s0 .char[data-off]{cursor:default}
+  #s0 .char:not([data-off]):hover{background:#DCEBF7}
+  #s0 .char:not([data-off]):active{transform:scale(.94)}
   #s0 h4{margin:0;font-size:clamp(18px,4.2cqh,32px);font-weight:900;letter-spacing:-.01em}
   #s0 .cat{font-size:clamp(12px,2.2cqh,16px);font-weight:500;color:#8A7F6E}
   #s0 .actions{margin-top:auto;display:flex;gap:1.8cqw}
@@ -331,7 +330,7 @@
 
   <h2>데모</h2>
   <p class="sub">챌린지 썸네일을 클릭하면 전체 화면 보기로 진입함. 우측 <b>진행 단계</b>로 4개 단계(개요·가이드 자세히 보기·기록하기·프로젝트 돌아보기)를 바로 이동할 수 있고, <b>스테이지 좌우 화살표</b>는 단계 안의 페이지까지 순서대로 지나감(개요의 아하's Pick 3장 → 가이드 페이지 → 기록하기 → 돌아보기).
-  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요의 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
+  미디어 위에서 <b>휠 또는 트랙패드 핀치로 확대</b>(카드가 프레임을 벗어나 화면 전체를 사용)하고 드래그로 이동, 더블클릭하면 원래 크기로 복귀함. 개요에서 <b>아하(캐릭터)를 누르면 말풍선 문구가 순차로 바뀜</b>(Pick 슬라이드에서는 반응 없음). 아하's Pick 이동 화살표·인디케이터는 <b>앱과 동일하게 이미지 안</b>에 있고, 가이드 페이지 전환(<code>◀ ▶</code>)만 카드 바깥 하단에 둠. <kbd>ESC</kbd> 또는 ✕로 복귀.</p>
   <div class="thumbs">
     <button class="thumb" onclick="openViewer(this)">
       <div class="art"><img src="{{THUMB1}}" alt="두근두근 비밀 상자 챌린지 썸네일"><span class="play">화면 보기 ▶</span></div>
@@ -368,7 +367,7 @@
       <button class="tab" id="tabInfo" role="tab" aria-selected="false" onclick="setTab('info')">수업 정보</button>
     </div>
     <div class="spacer"></div>
-    <button class="tb-btn" onclick="closeViewer()" aria-label="닫기">✕</button>
+    <button class="tb-btn" onclick="closeTop()" aria-label="닫기">✕</button>
   </div>
   <div class="body">
     <div class="viewerArea">
@@ -403,7 +402,7 @@
             <div class="pane info">
               <div class="charRow">
                 <div class="bubble" id="s0Bubble">오늘은 뭘 만들어 볼까? 두구두구~!</div>
-                <div class="char">🐦</div>
+                <button class="char" id="s0Char" onclick="ahaTap()" aria-label="아하">🐦</button>
               </div>
               <h4 id="s0Title">챌린지</h4>
               <div class="cat" id="s0Cat">🛠️ 만들기</div>
@@ -613,15 +612,15 @@
     if (btn) applyChallenge(btn.querySelector('.meta b').textContent,
                             btn.querySelector('.meta span').textContent,
                             btn.querySelector('img').src);
-    ov.hidden = false; stack.length = 0; cur = 0; pCur = 0; gCur = 0;
+    ov.hidden = false; stack.length = 0; cur = 0; pCur = 0; gCur = 0; ahaCur = 0;
     document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
     renderDepth(); setTab('view'); document.body.style.overflow='hidden';
   }
   function closeViewer(){ ov.hidden = true; stack.length = 0; renderDepth(); document.body.style.overflow=''; resetZoom(); }
 
   /* ===== 챌린지 상세 모달 스택 =====
-     수업 정보의 추천 챌린지를 누르면 그 챌린지의 전체 화면 모달이 위에 겹쳐 열리고,
-     상단 바의 뒤로(‹ 이전 챌린지명) 또는 ESC로 원래 모달로 돌아옴. ✕는 전체 닫기. */
+     수업 정보의 추천 챌린지를 누르면 그 챌린지의 모달이 동일한 전체 화면으로 위에 겹쳐 열리고,
+     상단 바의 뒤로(‹ 이전 챌린지명) · ✕ · ESC 모두 위 모달만 닫아 이전 챌린지 모달을 그대로 남김. */
   const stack = [];
   function currentState(){
     return {title:document.getElementById('ovTitle').textContent,
@@ -629,8 +628,9 @@
             thumb:document.getElementById('s0Thumb').src,
             tab:curTab, cur, pCur, gCur};
   }
+  /* 닫기·ESC는 위에 겹친 모달만 닫고 이전 챌린지 모달을 그대로 남김 */
+  function closeTop(){ if (stack.length) popChallenge(); else closeViewer(); }
   function renderDepth(){
-    ov.classList.toggle('stacked', stack.length > 0);
     const b = document.getElementById('backBtn');
     b.hidden = stack.length === 0;
     if (stack.length) b.textContent = '‹ ' + stack[stack.length-1].title;
@@ -640,7 +640,7 @@
     applyChallenge(card.querySelector('b').textContent,
                    card.querySelector('small').textContent,
                    card.querySelector('img').src);
-    cur = 0; pCur = 0; gCur = 0;
+    cur = 0; pCur = 0; gCur = 0; ahaCur = 0;
     document.querySelectorAll('#s3 .opt').forEach(o=>o.classList.remove('on'));
     renderDepth(); setTab('view');
   }
@@ -655,7 +655,7 @@
     const prev = cur;
     cur = Math.max(0, Math.min(N-1, i));
     /* 개요로 (재)진입하면 슬라이드는 챌린지 썸네일부터 다시 */
-    if (cur === 0 && prev !== 0) pCur = 0;
+    if (cur === 0 && prev !== 0){ pCur = 0; ahaCur = 0; }
     resetZoom();
     document.querySelectorAll('.screen').forEach((s,idx)=>s.classList.toggle('active', idx===cur));
     document.querySelectorAll('#stepList li').forEach((li,idx)=>{
@@ -703,17 +703,30 @@
      아하's Pick이 1개 이상 지정된 챌린지에만 이동 화살표가 노출됨.
      첫 슬라이드(썸네일)는 우측 화살표만, 마지막 슬라이드는 좌측 화살표만 노출. */
   const pickSlides = [
-    {bubble:'오늘은 뭘 만들어 볼까? 두구두구~!', label:'챌린지 썸네일'},
-    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 1 · 초록도마뱀"},
-    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 2 · 말랑이"},
-    {bubble:'다른 친구들은 어떻게 했을까?',      label:"아하's Pick 3 · 뭉치대장"},
+    {label:'챌린지 썸네일'},
+    {bubble:'다른 친구들은 어떻게 했을까?', label:"아하's Pick 1 · 초록도마뱀"},
+    {bubble:'다른 친구들은 어떻게 했을까?', label:"아하's Pick 2 · 말랑이"},
+    {bubble:'다른 친구들은 어떻게 했을까?', label:"아하's Pick 3 · 뭉치대장"},
   ];
-  let pCur = 0;
+  /* 아하를 탭하면 필수정보리스트가 말풍선에 순차로 노출됨(썸네일 슬라이드에서만) */
+  const ahaMsgs = [
+    '오늘은 뭘 만들어 볼까? 두구두구~!',
+    '상자 안에 뭐가 들었는지 손으로만 알아맞히는 놀이를 만들어 볼 거야!',
+    '준비물은 안 쓰는 상자랑 색종이만 있으면 충분해 😉',
+    '완성하면 친구한테 먼저 맞혀보라고 해봐. 반응이 제일 재밌어!',
+  ];
+  let pCur = 0, ahaCur = 0;
+  function ahaTap(){
+    if (pCur !== 0) return;                       // Pick 슬라이드에서는 반응 없음
+    ahaCur = (ahaCur + 1) % ahaMsgs.length;
+    document.getElementById('s0Bubble').textContent = ahaMsgs[ahaCur];
+  }
   function renderPick(){
     const p = pickSlides[pCur], last = pickSlides.length - 1;
     document.querySelectorAll('#s0Slides .slide').forEach((s,i)=>s.classList.toggle('on', i===pCur));
-    /* 아하 설명글도 슬라이드에 맞춰 자동 전환 */
-    document.getElementById('s0Bubble').textContent = p.bubble;
+    /* 아하 설명글도 슬라이드에 맞춰 자동 전환 — Pick에서는 고정 문구 */
+    document.getElementById('s0Bubble').textContent = p.bubble || ahaMsgs[ahaCur];
+    document.getElementById('s0Char').toggleAttribute('data-off', pCur !== 0);
     /* 기획자 표기(by.)는 챌린지 썸네일에만 — Pick은 이미지 위 프로필·닉네임으로 대체 */
     document.querySelector('#s0 .byChip').hidden = pCur !== 0;
     document.getElementById('pickPrev').toggleAttribute('data-off', pCur === 0);
@@ -833,7 +846,7 @@
   document.addEventListener('keydown', e=>{
     if (ov.hidden) return;
     /* 겹쳐 열린 모달이 있으면 ESC는 그 모달만 닫고 이전 모달로 복귀 */
-    if (e.key==='Escape'){ if (stack.length) popChallenge(); else closeViewer(); return; }
+    if (e.key==='Escape'){ closeTop(); return; }
     if (curTab !== 'view') return;      // 수업 정보 탭에서는 화면 넘기기 없음
     if (e.key==='ArrowLeft') go(-1);
     if (e.key==='ArrowRight') go(1);

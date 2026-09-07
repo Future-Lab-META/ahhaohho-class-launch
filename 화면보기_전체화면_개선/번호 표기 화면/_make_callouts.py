@@ -43,7 +43,7 @@ FRAMES = [
             '3':      {'sel': '#s0Cat', 'at': 'right', 'dx': 66, 'label': '카테고리'},
             '4':      {'sel': '#s0Title', 'at': 'right', 'dx': 66, 'label': '챌린지 제목'},
             '6':      {'sel': '#s0Bubble', 'at': 'left', 'dx': -64, 'label': '소개 문구(아하 설명글)'},
-            '7':      {'sel': '#s0 .char', 'at': 'right', 'dx': 60, 'label': '캐릭터'},
+            '7':      {'sel': '#s0Char', 'at': 'right', 'dx': 60, 'label': '아하 캐릭터(탭)'},
             '8':      {'sel': '#s0 .actions .btn.dark', 'at': 'bottom', 'dy': 34, 'label': '시작하기'},
             '9':      {'sel': '#s0 .actions .btn.ghost', 'at': 'bottom', 'dy': 34, 'label': '활동재료(앱 전용)'},
         },
