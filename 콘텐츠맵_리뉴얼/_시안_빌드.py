@@ -25,6 +25,8 @@ TOKENS = {
 }
 # 콘텐츠맵 카드 썸네일 — _리소스_준비.py로 아트리소스에서 축소해 둔 것
 TOKENS.update({f"T{i:02d}": W / "썸네일(축소)" / f"T{i:02d}.jpg" for i in range(1, 21)})
+# 빈 상태 일러스트 — 현행 큐레이션 만들기 모달 캡쳐에서 잘라낸 실제 디자인
+TOKENS["EMPTY"] = W / "빈 상태 일러스트.png"
 
 src = (W / "_시안_템플릿(이미지 삽입 전 소스).html").read_text(encoding="utf-8")
 for tok, path in TOKENS.items():

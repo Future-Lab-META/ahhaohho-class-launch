@@ -60,6 +60,18 @@ FRAMES = [
         },
     ),
     dict(
+        # 결과 0건 — '수와 생각' + 난이도 5는 교차하는 챌린지가 없는 조합
+        name='필터_결과없음',
+        setup=(HIDE_NOTE +
+               "if(document.getElementById('fPanel').hidden) toggleFilter();"
+               "document.querySelector('.fChip[data-k=\"cat\"][data-v=\"수와 생각\"]').click();"
+               "document.querySelector('.fChip[data-k=\"lv\"][data-v=\"5\"]').click();"),
+        co={
+            '8':   {'sel': '.count', 'at': 'right', 'dx': 92, 'label': '챌린지 0개'},
+            '7-6': {'sel': '#empty p', 'at': 'left', 'dx': -104, 'label': '결과 없음 안내'},
+        },
+    ),
+    dict(
         name='카드클릭_모달',
         setup=(HIDE_NOTE +
                "if(!document.getElementById('fPanel').hidden) toggleFilter();"
