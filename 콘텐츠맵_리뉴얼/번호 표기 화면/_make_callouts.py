@@ -27,13 +27,15 @@ FRAMES = [
         name='기본화면',
         setup=HIDE_NOTE + "if(!document.getElementById('fPanel').hidden) toggleFilter();",
         co={
-            '1':  {'sel': '.navList li.now button', 'at': 'right', 'dx': 66, 'label': '사이드바 콘텐츠맵', 'tone': 'green'},
+            # 사이드바 항목은 폭이 264px 전체 — 밖으로 빼면 본문·이웃 항목을 덮으므로
+            # 같은 행 안쪽 오른쪽(메뉴 텍스트 오른편 빈 공간)에 둠
+            '1':  {'sel': '.navList li.now button', 'at': 'right', 'dx': -80, 'label': '사이드바 메뉴', 'tone': 'green'},
             '2':  {'sel': '.removedBtn', 'at': 'bottom', 'dy': 30, 'label': '기존 버튼 제거', 'tone': 'blue'},
             '3':  {'sel': '.pageHead h1', 'at': 'right', 'dx': 62, 'label': '화면 제목'},
             '4':  {'sel': '.headBtns', 'at': 'top', 'dy': -30, 'label': '수업 사례·큐레이션 만들기'},
             '5':  {'sel': '.searchBox', 'at': 'left', 'dx': -62, 'label': '검색창'},
             '6':  {'sel': '.filterBtn', 'at': 'left', 'dx': -64, 'label': '필터 버튼', 'tone': 'green'},
-            '8':  {'sel': '.count', 'at': 'right', 'dx': 56, 'label': '챌린지 수'},
+            '8':  {'sel': '.count', 'at': 'right', 'dx': 92, 'label': '챌린지 수'},
             '9':  {'sel': '.sortSel', 'at': 'right', 'dx': 58, 'label': '정렬', 'tone': 'green'},
             # 카드 폭이 141px로 좁아 카드 사이에 배지를 둘 수 없음 → 첫 카드 기준으로 왼쪽에 세로 배치
             '10-2': {'sel': '#grid .newTag', 'at': 'left', 'dx': -58, 'label': 'NEW 배지', 'tone': 'green'},
