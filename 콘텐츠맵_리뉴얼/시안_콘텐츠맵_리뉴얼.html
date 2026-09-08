@@ -1140,7 +1140,8 @@
       if (!q) return true;
       /* 검색 로직은 큐레이션 만들기 모달과 동일 — 재료(준비물)·주제(활동 키워드)
          + 챌린지명·설명까지 부분 일치 */
-      return [it.title, it.mats, it.kw, it.desc].join(' ').toLowerCase().includes(q);
+      /* 검색 대상은 재료(준비물)·주제(활동 키워드)·챌린지명 — 챌린지 설명은 포함하지 않음 */
+      return [it.title, it.mats, it.kw].join(' ').toLowerCase().includes(q);
     });
     const cmp = {
       reg:(a,b)=>b.reg - a.reg,
