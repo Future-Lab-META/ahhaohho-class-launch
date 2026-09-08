@@ -10,7 +10,7 @@ import base64, mimetypes, pathlib
 BASE = pathlib.Path("/Users/hakkim/Desktop/디지털창의환경팀/아하오호 클래스 정식 출시")
 W    = BASE / "콘텐츠맵_리뉴얼"
 C    = BASE / "챌린지_상세보기모달_전체화면_개선"
-EX   = BASE / "프로젝트_상세모달_전체화면_개선" / "예시 프로젝트"
+EX   = pathlib.Path("/Users/hakkim/Desktop/디지털창의환경팀/아트리소스/게시물 예시 이미지")
 
 TOKENS = {
     "THUMB1":  C / "챌린지 썸네일 예시 이미지1.png",
@@ -23,6 +23,8 @@ TOKENS = {
     "AV1":     EX / "76da0b63-0439-40cc-9fa2-7ffc8851c2fc.jpeg",
     "AV2":     EX / "ff6548d9-73ce-4074-8124-e3a218e3dcdd.jpeg",
 }
+# 콘텐츠맵 카드 썸네일 — _리소스_준비.py로 아트리소스에서 축소해 둔 것
+TOKENS.update({f"T{i:02d}": W / "썸네일(축소)" / f"T{i:02d}.jpg" for i in range(1, 21)})
 
 src = (W / "_시안_템플릿(이미지 삽입 전 소스).html").read_text(encoding="utf-8")
 for tok, path in TOKENS.items():
