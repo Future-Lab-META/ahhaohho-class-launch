@@ -34,7 +34,7 @@ FRAMES = [
             '공통 1': {'sel': '#ovTitle', 'at': 'bottom', 'dx': 46, 'dy': 34, 'label': '챌린지명'},
             '공통 2': {'sel': '.topbar .tb-btn:last-child', 'at': 'bottom', 'dy': 30, 'label': '모달 닫기'},
             '공통 3': {'sel': '#tabInfo', 'at': 'bottom', 'dy': 34, 'label': '구분탭'},
-            '공통 4': {'sel': '#stepList', 'at': 'left', 'dx': -74, 'label': '진행 단계', 'tone': 'blue'},
+            '공통 4': {'sel': '#stepList', 'at': 'left', 'dx': -74, 'label': '진행 단계'},
             '공통 5': {'sel': '.device', 'at': 'left', 'dx': -70, 'label': '앱 화면 카드', 'tone': 'blue'},
             '공통 6': {'sel': '.device', 'at': 'topright', 'dx': -96, 'dy': 54, 'label': '확대(휠·핀치)', 'tone': 'green'},
             '공통 7': {'sel': '#hintView', 'at': 'top', 'dy': -26, 'label': '조작 안내', 'tone': 'green'},
