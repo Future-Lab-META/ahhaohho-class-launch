@@ -145,7 +145,7 @@ OVERLAY = r"""
   .co{
     position:absolute;transform:translate(-50%,-50%);
     background:#E8380D;color:#fff;border-radius:999px;
-    font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo",sans-serif;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
     font-size:11.5px;font-weight:500;line-height:1;
     padding:5px 9px 5px 6px;white-space:nowrap;
     box-shadow:0 2px 8px rgba(0,0,0,.5);
