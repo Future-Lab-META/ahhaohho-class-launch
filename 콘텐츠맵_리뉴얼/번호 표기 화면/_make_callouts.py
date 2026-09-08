@@ -29,7 +29,9 @@ FRAMES = [
         co={
             # 사이드바 항목은 폭이 264px 전체 — 밖으로 빼면 본문·이웃 항목을 덮으므로
             # 같은 행 안쪽 오른쪽(메뉴 텍스트 오른편 빈 공간)에 둠
-            '1':  {'sel': '.navList li.now button', 'at': 'right', 'dx': -80, 'label': '사이드바 메뉴', 'tone': 'green'},
+            '1':  {'sel': '.navList li.now button', 'at': 'right', 'dx': -80, 'label': '사이드바 메뉴', 'tone': 'green',
+                   # 배지가 메뉴 행 안에 들어가 있어 연결선·점이 오히려 지저분해짐
+                   'noLine': True},
             '2':  {'sel': '.removedBtn', 'at': 'bottom', 'dy': 30, 'label': '기존 버튼 제거', 'tone': 'blue'},
             '3':  {'sel': '.pageHead h1', 'at': 'right', 'dx': 62, 'label': '화면 제목'},
             '4':  {'sel': '.headBtns', 'at': 'top', 'dy': -30, 'label': '수업 사례·큐레이션 만들기'},
@@ -173,7 +175,7 @@ function drawCallouts(){
 
   for (const it of items){
     const {ax, ay, bx, by, w, h, cfg} = it;
-    if (!it.hasOffset) continue;
+    if (!it.hasOffset || cfg.noLine) continue;
     const color = cfg.tone === 'blue' ? '#1668D9' : cfg.tone === 'green' ? '#137A46' : '#E8380D';
     const dx = ax - bx, dy = ay - by;
     const k = Math.min(1,
