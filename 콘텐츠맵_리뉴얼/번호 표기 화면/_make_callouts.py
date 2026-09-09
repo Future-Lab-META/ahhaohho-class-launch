@@ -34,7 +34,8 @@ FRAMES = [
                    'noLine': True},
             '2':  {'sel': '.removedBtn', 'at': 'bottom', 'dy': 30, 'label': '기존 버튼 제거', 'tone': 'blue'},
             '3':  {'sel': '.pageHead h1', 'at': 'right', 'dx': 62, 'label': '화면 제목'},
-            '4':  {'sel': '.headBtns', 'at': 'top', 'dy': -30, 'label': '수업 사례·큐레이션 만들기'},
+            # 설명 문구를 뺀 뒤 제목 행이 올라가 위쪽에 배지를 둘 자리가 없음 → 버튼 왼쪽 빈 공간에 둠
+            '4':  {'sel': '.headBtns', 'at': 'left', 'dx': -70, 'label': '수업 사례·큐레이션 만들기'},
             '5':  {'sel': '.searchBox', 'at': 'left', 'dx': -62, 'label': '검색창'},
             '6':  {'sel': '.filterBtn', 'at': 'left', 'dx': -64, 'label': '필터 버튼', 'tone': 'green'},
             '8':  {'sel': '.count', 'at': 'right', 'dx': 92, 'label': '챌린지 수'},
