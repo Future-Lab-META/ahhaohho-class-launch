@@ -54,7 +54,15 @@ FRAMES = [
             '6':   {'sel': '#s0Bubble', 'at': 'left', 'dx': -64, 'label': '소개 문구(아하 설명글)'},
             '7':   {'sel': '#s0Char', 'at': 'right', 'dx': 60, 'label': '아하 캐릭터(탭)'},
             '8':   {'sel': '#s0 .actions .btn.dark', 'at': 'bottom', 'dy': 34, 'label': '시작하기'},
-            '9':   {'sel': '#s0 .actions .btn.ghost', 'at': 'bottom', 'dy': 34, 'label': '활동재료(앱 전용)'},
+            '9':   {'sel': '#s0 .actions .btn.ghost', 'at': 'bottom', 'dy': 34, 'label': '활동재료', 'tone': 'blue'},
+        },
+    ),
+    dict(
+        # 활동재료 클릭 → 준비물 모달 (개요 9)
+        name='개요_준비물모달',
+        setup="setTab('view'); show(0); openMaterials();",
+        co={
+            '9': {'sel': '#matModal .card', 'at': 'right', 'dx': 70, 'label': '준비물 모달', 'tone': 'blue'},
         },
     ),
     dict(
