@@ -98,10 +98,11 @@ FRAMES = [
     ),
     dict(
         name='프로젝트_돌아보기',
-        setup="setTab('view'); show(3); pickOpt(document.querySelectorAll('#s3 .opt')[1]);",
+        # 선택지는 클릭 불가·표시 전용으로 바뀌어 선택 상태를 만들지 않음 (돌아보기 2)
+        setup="setTab('view'); show(3);",
         co={
             '1': {'sel': '#s3 .bubble', 'at': 'top', 'dy': -28, 'label': '느낀점 선택 안내'},
-            '2': {'sel': '#s3 .opt.on', 'at': 'left', 'dx': -62, 'label': '돌아보기 데이터(선택 상태)'},
+            '2': {'sel': '#s3 .opt:nth-of-type(2)', 'at': 'left', 'dx': -62, 'label': '돌아보기 데이터(표시 전용)'},
             '3': {'sel': '#s3 .foot .btn', 'at': 'top', 'dy': -30, 'label': '완료'},
         },
     ),
