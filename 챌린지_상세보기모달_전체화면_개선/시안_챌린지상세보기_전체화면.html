@@ -630,10 +630,10 @@
     <aside class="rail" id="rail">
       <h3>진행 단계</h3>
       <ul class="steps" id="stepList">
-        <li><button onclick="show(0)"><span class="dot">✓</span>개요</button></li>
-        <li><button onclick="show(1)"><span class="dot">✓</span>가이드 자세히 보기</button></li>
-        <li><button onclick="show(2)"><span class="dot">✓</span>기록하기</button></li>
-        <li><button onclick="show(3)"><span class="dot">✓</span>프로젝트 돌아보기</button></li>
+        <li><button onclick="railGo(0)"><span class="dot">✓</span>개요</button></li>
+        <li><button onclick="railGo(1)"><span class="dot">✓</span>가이드 자세히 보기</button></li>
+        <li><button onclick="railGo(2)"><span class="dot">✓</span>기록하기</button></li>
+        <li><button onclick="railGo(3)"><span class="dot">✓</span>프로젝트 돌아보기</button></li>
       </ul>
       <p class="railHint">단계를 클릭하면 해당 화면으로 이동함.</p>
     </aside>
@@ -701,11 +701,16 @@
     cur = s.cur; pCur = s.pCur; gCur = s.gCur;
     setTab(s.tab);
   }
+  /* 진행 단계 레일 클릭 — 항상 그 단계의 첫 페이지로 (공통 4).
+     좌우 화살표·키보드는 go()가 페이지를 직접 지정하므로 순차 이동이 유지됨 */
+  function railGo(i){ pCur = 0; gCur = 0; ahaCur = 0; show(i); }
+
   function show(i){
     const prev = cur;
     cur = Math.max(0, Math.min(N-1, i));
-    /* 개요로 (재)진입하면 슬라이드는 챌린지 썸네일부터 다시 */
+    /* 다른 단계에서 진입하면 첫 페이지부터 — 개요는 챌린지 썸네일, 가이드는 1/n */
     if (cur === 0 && prev !== 0){ pCur = 0; ahaCur = 0; }
+    if (cur === 1 && prev !== 1){ gCur = 0; }
     resetZoom();
     document.querySelectorAll('.screen').forEach((s,idx)=>s.classList.toggle('active', idx===cur));
     document.querySelectorAll('#stepList li').forEach((li,idx)=>{
