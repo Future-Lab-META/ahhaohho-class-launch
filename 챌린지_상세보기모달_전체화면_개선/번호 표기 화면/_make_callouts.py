@@ -62,7 +62,8 @@ FRAMES = [
         name='개요_준비물모달',
         setup="setTab('view'); show(0); openMaterials();",
         co={
-            '9': {'sel': '#matModal .card', 'at': 'right', 'dx': 70, 'label': '준비물 모달', 'tone': 'blue'},
+            '9':   {'sel': '#s0 .actions .btn.ghost', 'at': 'bottom', 'dy': 34, 'label': '활동재료', 'tone': 'blue'},
+            '9-1': {'sel': '#matModal .card', 'at': 'right', 'dx': 70, 'label': '준비물 모달', 'tone': 'blue'},
         },
     ),
     dict(
