@@ -328,7 +328,7 @@
 
   /* 준비물 모달 — 전체 화면 모달 위에 겹치는 작은 모달 (개요 9) */
   .matModal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
-  .matModal .card{width:380px;max-width:calc(100vw - 48px);max-height:calc(100vh - 96px);overflow:auto;background:#fff;border-radius:18px;
+  .matModal .card{transform-origin:center;width:380px;max-width:calc(100vw - 48px);max-height:calc(100vh - 96px);overflow:auto;background:#fff;border-radius:18px;
     box-shadow:0 18px 48px rgba(0,0,0,.35);padding:22px 22px 20px;font-family:inherit;color:#26221C}
   .matModal .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
   .matModal h4{margin:0;font-size:17px;font-weight:800}
@@ -886,6 +886,16 @@
   function applyZoom(){
     dev.style.transform = zs === 1 ? '' : `translate(${ztx}px, ${zty}px) scale(${zs})`;
     dev.classList.toggle('grab', zs > 1);
+    syncMatZoom();
+  }
+  /* 준비물 모달(개요 9)은 카드 배율을 그대로 따름 — 단 화면을 넘지 않는 크기까지만 */
+  function syncMatZoom(){
+    const m = document.getElementById('matModal');
+    if (!m || m.hidden) return;
+    const c = m.querySelector('.card');
+    const fit = Math.min((innerWidth - 48) / c.offsetWidth, (innerHeight - 48) / c.offsetHeight);
+    const k = Math.min(zs, fit);
+    c.style.transform = k === 1 ? '' : `scale(${k})`;
   }
   function resetZoom(){ zs = 1; ztx = 0; zty = 0; applyZoom(); }
   function clampPan(){
@@ -895,9 +905,12 @@
     ztx = Math.max(-(bx + W * zs - 80), Math.min(va.clientWidth  - bx - 80, ztx));
     zty = Math.max(-(by + H * zs - 80), Math.min(va.clientHeight - by - 80, zty));
   }
-  va.addEventListener('wheel', e=>{
+  function zoomWheel(e){
     /* 수업 정보 탭은 확대 없음 — 휠·핀치 모두 브라우저 기본 동작(스크롤)에 맡김 */
     if (curTab === 'info') return;
+    /* 준비물 모달 목록이 넘쳐 스크롤이 필요하면 그쪽은 스크롤에 맡김 */
+    const mc = e.target.closest && e.target.closest('.matModal .card');
+    if (mc && mc.scrollHeight > mc.clientHeight) return;
     e.preventDefault();
     const r = dev.getBoundingClientRect();
     const bx = r.left - ztx, by = r.top - zty;           // 변환 전 카드 좌상단(뷰포트 기준)
@@ -911,7 +924,9 @@
     zs = ns;
     if (zs === 1){ ztx = 0; zty = 0; } else clampPan();
     applyZoom();
-  }, {passive:false});
+  }
+  va.addEventListener('wheel', zoomWheel, {passive:false});
+  document.getElementById('matModal').addEventListener('wheel', zoomWheel, {passive:false});
   let drag = null;
   dev.addEventListener('mousedown', e=>{
     if (zs === 1) return;
@@ -945,6 +960,7 @@
     list.innerHTML = '';
     document.querySelectorAll('#ci-mat .ciMat').forEach(el => list.appendChild(el.cloneNode(true)));
     matModal.hidden = false;
+    syncMatZoom();
   }
-  function closeMaterials(){ matModal.hidden = true; }
+  function closeMaterials(){ matModal.hidden = true; matModal.querySelector('.card').style.transform = ''; }
 </script>
