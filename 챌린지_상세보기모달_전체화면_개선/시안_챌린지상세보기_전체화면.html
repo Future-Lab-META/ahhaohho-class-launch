@@ -382,7 +382,7 @@
 </div>
 
 <!-- 준비물 모달 (개요 9 활동재료) — 뷰어 위에 겹침. 딤·✕·ESC로 닫힘 -->
-<div class="matModal" id="matModal" hidden role="dialog" aria-modal="true" aria-label="준비물" onclick="if(event.target===this) closeMaterials()">
+<div class="matModal" id="matModal" hidden role="dialog" aria-modal="true" aria-label="준비물">
   <div class="card">
     <div class="head"><h4>준비물</h4><button class="x" onclick="closeMaterials()" aria-label="닫기">✕</button></div>
     <div class="list" id="matList"></div>
@@ -962,5 +962,14 @@
     matModal.hidden = false;
     syncMatZoom();
   }
-  function closeMaterials(){ matModal.hidden = true; matModal.querySelector('.card').style.transform = ''; }
+  function closeMaterials(){ clearTimeout(matCloseTimer); matModal.hidden = true; matModal.querySelector('.card').style.transform = ''; }
+  /* 딤 한 번 클릭 = 닫기, 더블클릭 = 배율 초기화(공통 6과 같은 조작).
+     둘을 구분하기 위해 닫기는 250ms 뒤에 실행하고, 그 안에 더블클릭이 오면 취소함 */
+  let matCloseTimer = null;
+  matModal.addEventListener('click', e => {
+    if (e.target !== matModal) return;
+    clearTimeout(matCloseTimer);
+    matCloseTimer = setTimeout(closeMaterials, 250);
+  });
+  matModal.addEventListener('dblclick', () => { clearTimeout(matCloseTimer); resetZoom(); });
 </script>
